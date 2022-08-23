@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import  Book
-from .serializer import BookSerializer
+from .models import  Tag
+from .serializer import TagSerializer
 from rest_framework import status
 
 # Create your views here.
@@ -9,27 +9,27 @@ from rest_framework import status
 class AllTagsAPI(APIView):
     def get(self, request):
         tags = Tag.objects.all()
-        serializer = TagSerializer(books, many=True)
+        serializer = TagSerializer(tags, many=True)
         
         print(serializer.data)
         return Response(serializer.data)
 
     def post(self, request):
-            serializer = BookSerializer(data=request.data)
+            serializer = TagSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class BookAPI(APIView):
+class TagAPI(APIView):
     def get(self, request, pk):
-        book = Book.objects.get(id = pk)
-        serializer = BookSerializer(book)
+        tag = Tag.objects.get(id = pk)
+        serializer = TagSerializer(tag)
         print(serializer.data)
         return Response(serializer.data)
     
     def post(self, request):
-        serializer = BookSerializer(data=request.data)
+        serializer = TagSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
