@@ -8,7 +8,7 @@ class User(models.Model):
     contact = models.CharField(max_length=15)
     email = models.EmailField(null=True, blank= True)
     photo = models.ImageField(null= True, blank=True)
-    followed = models.ManyToManyField(Tag, related_name="wisher")
+    followed = models.ManyToManyField(Tag, related_name="followed", default=None)
 
 
     def __str__(self) -> str:
