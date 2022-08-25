@@ -19,7 +19,7 @@ class UserAPI(APIView):
         print(serializer.data)
         return Response(serializer.data)
     
-    def post(self, request, pk):
+    def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
