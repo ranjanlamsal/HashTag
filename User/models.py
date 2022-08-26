@@ -6,7 +6,7 @@ from Tag.models import Tag
 class User(models.Model):
 
     name = models.CharField(max_length=120)
-    username = models.CharField(max_length=120, null=True, blank=True)
+    username = models.CharField(max_length=120, null=True, blank=True )
     email = models.EmailField(null=True, blank= True)
     password = models.CharField(max_length=128, null=True, blank=True)
     password2 = models.CharField(max_length=128, null=True, blank=True)
