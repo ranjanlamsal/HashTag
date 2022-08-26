@@ -5,10 +5,12 @@ from Tag.models import Tag
 class User(models.Model):
 
     name = models.CharField(max_length=120)
-    contact = models.CharField(max_length=15)
-    email = models.EmailField(null=True, blank= True)
-    photo = models.ImageField(null= True, blank=True)
-    followed = models.ManyToManyField(Tag, related_name="followed", default=None)
+    username = models.CharField(max_length=120, null=False, blank=False)
+    email = models.EmailField(null=False, blank= False)
+    password = models.CharField(max_length=128, null=False, blank=False)
+    password2 = models.CharField(max_length=128, null=False, blank=False)
+    # photo = models.ImageField(null= True, blank=True)
+    # followed = models.ManyToManyField(Tag, related_name="followed", default=None)
 
 
     def __str__(self) -> str:
