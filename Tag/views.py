@@ -1,3 +1,5 @@
+from django.shortcuts import redirect, render
+from django.http import Http404, HttpResponseBadRequest
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import  Tag
