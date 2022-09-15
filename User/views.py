@@ -2,7 +2,7 @@ import genericpath
 from django.shortcuts import redirect, render
 from .models import User
 from django.http import Http404, HttpResponseBadRequest
-from User.serializer import UserLoginSerializer, UserLogoutSerializer, UserCreateSerializer
+from User.serializer import UserLoginSerializer, UserLogoutSerializer, UserCreateSerializer, Userserializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -19,7 +19,7 @@ from . import serializer
 class UserAPI(APIView):
     def get(self, request):
         users = User.objects.all()
-        serializer = UserCreateSerializer(users, many=True)
+        serializer = Userserializer(users, many=True)
         print(serializer.data)
         return Response(serializer.data)
     
@@ -58,7 +58,7 @@ class UserAPI(APIView):
 class UserInfoAPI(APIView):
     def get(self, request, pk):
         user = User.objects.get(id = pk)
-        serializer = UserCreateSerializer(user)
+        serializer = Userserializer(user)
         print(serializer.data)
         return Response(serializer.data)
     
@@ -72,8 +72,8 @@ class UserInfoAPI(APIView):
 
 class UserFollowedTagAPI(APIView):
     def get(self, request, pk):
-        user = User.objects.get(id = pk)
-        followed_tags = Tag.objects.filter(user = user)
+        user1 = User.objects.get(id = pk)
+        followed_tags = user1.followed
         print(followed_tags)
         serializer = TagSerializer(followed_tags, many = True)
         return Response(serializer.data)
@@ -91,7 +91,7 @@ class Login(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         serializer_class = UserLoginSerializer(data=request.data)
-        if serializer_class.is_valid(raise_exception=True):
+        if not serializer_class.is_valid(raise_exception=True):
             return Response(serializer_class.data, status=status.HTTP_200_OK)
         return Response(serializer_class.errors, status=status.HTTP_400_BAD_REQUEST)
 

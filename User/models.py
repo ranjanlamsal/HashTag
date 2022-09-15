@@ -11,7 +11,7 @@ class User(models.Model):
     password2 = models.CharField(max_length=128)
     photo = models.ImageField(null= True, blank=True)
     ifLogged = models.BooleanField(default=False)
-    # followed = models.ManyToManyField(Tag, related_name="followed", default=None)
+    followed = models.ManyToManyField(Tag, related_name="followed", default=None)
 
     # username = models.CharField(max_length=120, null=True, blank=True)
     # email = models.EmailField(null=True, blank= True)
