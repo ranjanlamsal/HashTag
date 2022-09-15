@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'Tag',
-    'User'
+    'User',
+    'PostApp'
 ]
 
 MIDDLEWARE = [

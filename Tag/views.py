@@ -15,14 +15,6 @@ class AllTagsAPI(APIView):
         
         print(serializer.data)
         return Response(serializer.data)
-
-    def post(self, request):
-            serializer = TagSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 class TagAPI(APIView):
     def get(self, request, pk):
         tag = Tag.objects.get(id = pk)
