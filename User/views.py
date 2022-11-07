@@ -69,15 +69,6 @@ class UserInfoAPI(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class UserFollowedTagAPI(APIView):
-    def get(self, request, pk):
-        user1 = User.objects.get(id = pk)
-        followed_tags = user1.followed
-        print(followed_tags)
-        serializer = TagSerializer(followed_tags, many = True)
-        return Response(serializer.data)
-
 class User_Create_APIView(generics.ListCreateAPIView):
     # get method handler
     queryset = User.objects.all()

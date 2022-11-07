@@ -2,6 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.AllTagsAPI.as_view()),
-    path('<pk>', views.TagAPI.as_view()),
+    path('', views.TagListCreateAPIView.as_view()),
+    path('<pk>', views.TagDetailAPIView.as_view()),
+    
 ]

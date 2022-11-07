@@ -5,6 +5,9 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.core.exceptions import ValidationError
 from Tag.serializer import TagSerializer
+from Tag.models import Tag
+from User.models import User
+from User.serializer import Userserializer
 
 
 from .models import Post
@@ -25,15 +28,4 @@ class PostCreateSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Post
-        fields = (
-            'title',
-            'content',
-        )
-    def create(self, validated_data):
-        postTocreate = Post.objects.create(
-            title = validated_data['title'],
-            content = validated_data['content']
-        )
-        postTocreate.save()
-
-        return postTocreate
+        fields = "__all__"

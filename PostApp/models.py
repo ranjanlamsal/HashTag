@@ -6,11 +6,11 @@ from User.models import User
 class Post(models.Model):
     title = models.CharField(max_length=120)
     content = models.TextField(blank= True, null= True)
-    posted_by = models.ForeignKey(User,on_delete=models.CASCADE, related_name="posts", default=None)
+    posted_by = models.OneToOneField(User,on_delete=models.CASCADE, related_name="posted_by")
     photo = models.ImageField(null = True, blank = True)
-    tag = models.ManyToManyField(Tag, blank = True, null = True, default=None)
+    tag = models.OneToOneField(Tag, on_delete = models.CASCADE)
     no_of_likes = models.IntegerField(default=0)
-    liked_by = models.ManyToManyField(User, default=None, blank = True)
+    liked_by = models.ManyToManyField(User, default=None, blank = True, related_name = "liked_by")
 
 
     def __str__(self) -> str:

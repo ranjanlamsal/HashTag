@@ -16,30 +16,36 @@ from Tag.serializer import TagSerializer
 from rest_framework import status
 # Create your views here.
 
-class PostsAPI(APIView):
-    def get(self, request):
-        posts = Post.objects.all()
-        serializer = PostSerializer(posts, many=True)
-        print(serializer.data)
-        return Response(serializer.data)
-    def post(self, request):
-        serializer = PostCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class PostInfoAPI(APIView):
-    def get(self, request, pk):
-        post = Post.objects.get(id = pk)
-        serializer = PostSerializer(post)
-        print(serializer.data)
-        return Response(serializer.data)
-
-class CreatePost(generics.ListCreateAPIView):
+class PostsListCreateAPIView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostCreateSerializer
+    
+    def perform_create(self, serializer):
+        title = serializer.validated_data.get('title')
+        content = serializer.validated_data.get('content')
+        posted_by = serializer.validated_data.get('posted_by')
+        tag = serializer.validated_data.get('tag')
+        serializer.save(title, content, posted_by, tag)
 
+Post_list_create_view = PostsListCreateAPIView.as_view()
+
+    # def get(self, request):
+    #     posts = Post.objects.all()
+    #     serializer = PostSerializer(posts, many=True)
+    #     print(serializer.data)
+    #     return Response(serializer.data)
+    # def post(self, request):
+    #     serializer = PostCreateSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PostDetailAPIView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+
+Post_detail_view = PostDetailAPIView.as_view()
 
 class ModifyPostAPI(APIView):
     def post(self, request, pk):

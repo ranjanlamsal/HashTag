@@ -10,6 +10,6 @@ urlpatterns = [
     path('logout/', Logout.as_view(), name="logout"),
     path('', views.UserAPI.as_view(), name='UserAPI'),
     path('<pk>/', views.UserInfoAPI.as_view(), name='UserInfoAPI'),
-    path('<pk>/followed', views.UserFollowedTagAPI.as_view(), name='UserFollowedTagAPI'),
+    # path('<pk>/followed', views.UserFollowedTagAPI.as_view(), name='UserFollowedTagAPI'),
     
 ]

@@ -13,7 +13,6 @@ class Userserializer(serializers.ModelSerializer):
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
-    # my_discount = serializers.SerializerMethodField(read_only = True)
     name = serializers.CharField(required = True)
     email = serializers.EmailField(
         required=True,
@@ -97,12 +96,13 @@ class UserLoginSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'username',
-            'password',
             'token',
+            'password'
         )
 
         read_only_fields = (
             'token',
+            'password'
         )
 
 
