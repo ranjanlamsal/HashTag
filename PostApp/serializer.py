@@ -20,8 +20,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 class PostCreateSerializer(serializers.ModelSerializer):
     title = serializers.CharField(
-        required = True,
-        validators = [UniqueValidator(queryset = Post.objects.all())]
+        required = True
     )
     content = serializers.CharField(
         required = True

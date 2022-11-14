@@ -25,6 +25,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     password2 = serializers.CharField(write_only=True, required=True)
 
+
     class Meta:
         model = User
         fields = (
@@ -40,18 +41,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"password": "Password fields didn't match."})
 
             return attrs
-
-        def create(self, validated_data):
-            user = User.objects.create(
-                username=validated_data['username'],
-                email=validated_data['email'],
-                name = validated_data['name'],
-            )
-
-            user.set_password(validated_data['password'])
-            user.save()
-
-            return user
 
     
 class UserLoginSerializer(serializers.ModelSerializer):
@@ -115,7 +104,7 @@ class UserLogoutSerializer(serializers.ModelSerializer):
         user = None
         try:
             user = User.objects.get(username=username)
-            if not user.ifLogged:
+            if not user.ifLoogged:
                 raise ValidationError("User is not logged in.")
                 return
         except Exception as e:
