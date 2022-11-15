@@ -10,6 +10,7 @@ class User(models.Model):
     password = models.CharField(max_length=32)
     password2 = models.CharField(max_length=32)
     ifLogged = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return self.username

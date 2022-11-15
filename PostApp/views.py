@@ -31,9 +31,11 @@ class PostsListCreateAPIView(generics.ListCreateAPIView):
     
     def perform_create(self, serializer):
         tag = serializer.validated_data.get('tag')
-        if tag in Tag.objects.all():
-            serializer.save(tag= tag)
+        tag_to_assign = Tag.objects.all().filter(title=tag)
+        if tag_to_assign is not None:
+            serializer.save(tag= tag_to_assign)
             return Response(serializer.data)
+        
         return Response({"invalid": "tag doesnot exists"}, status = 404)
         
         
