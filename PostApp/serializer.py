@@ -19,11 +19,16 @@ class PostSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class PostCreateSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(
-        required = True
-    )
+    # title = serializers.CharField(
+    #     required = True
+    # )
     content = serializers.CharField(
         required = True
+    )
+    tag = serializers.PrimaryKeyRelatedField(
+        queryset = Tag.objects.all(),
+        required = True,
+        many = False
     )
     class Meta:
         model = Post
