@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from Tag.serializer import TagSerializer
 from Tag.models import Tag
 from User.models import User
-from User.serializer import Userserializer
+from User.serializer import UserSerializer
 
 
 from .models import Post
