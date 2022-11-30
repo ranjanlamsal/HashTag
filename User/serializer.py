@@ -1,6 +1,7 @@
 from uuid import uuid4
 from django.db.models import Q # for queries
 from django.contrib.auth.models import User
+from nbformat import ValidationError
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from .models import UserProfile
@@ -8,8 +9,6 @@ from .models import UserProfile
 
 from rest_framework import serializers
 from .models import UserProfile
-
-from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from rest_framework.permissions import IsAuthenticated
@@ -28,6 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
                 'first_name',
                 'last_name',
                 'email',
+                'password',
                 )
         validators = [
                 UniqueTogetherValidator(
@@ -41,7 +41,15 @@ class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.SlugRelatedField(slug_field='username', read_only=True)
     class Meta:
         model = UserProfile
+        fields = ['username', 'id', 'first_name', 'last_name','email']
+
+class UserPublicProfileSerializer(serializers.ModelSerializer):
+    username = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    class Meta:
+        model = UserProfile
         fields = ['username', 'id', 'first_name', 'last_name']
+        depth = 1
+
 
 
 

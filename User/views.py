@@ -56,6 +56,7 @@ class UserProfileInfoView(APIView):
         user = get_object(request)
         user_email = request.user.email
         serializer = UserProfileSerializer(user).data
+        print(request.user.username)
         return Response(serializer)
 
     def put(self, request):
@@ -83,17 +84,17 @@ def get_object(request):
         #return Traveller.objects.get(username=user)
     except UserProfile.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
-
-
+        
 class UserDetailAPIView(generics.RetrieveAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-    # authentication_classes = [
-    #     authentication.SessionAuthentication,
-    #     authentication.TokenAuthentication,
-    # ]
 
-    # permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        authentication.TokenAuthentication,
+    ]
+
+    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
 
 user_detail_view = UserDetailAPIView.as_view()
 
@@ -111,6 +112,7 @@ class UserListAPIView(generics.ListAPIView):
 
 userlistview = UserListAPIView.as_view()
 
+
 # class UserUpdaeteDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = UserProfile.objects.all()
 #     serializer_class = Userserializer
@@ -121,8 +123,8 @@ userlistview = UserListAPIView.as_view()
 
     # permission_classes = [permissions.DjangoModelPermissions]
 # user_update_destroy_view = UserUpdaeteDestroyAPIView.as_view()
+
 # class Login(generics.GenericAPIView):
-#     # get method handler
 #     queryset = UserProfile.objects.all()
 #     serializer_class = UserLoginSerializer
 

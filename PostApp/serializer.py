@@ -13,15 +13,18 @@ from User.serializer import UserSerializer
 from .models import Post
 
 class PostSerializer(serializers.ModelSerializer):
-    # my_discount = serializers.SerializerMethodField(read_only = True)
+    upvote_count = serializers.SerializerMethodField('get_upvote_count')
+
+    def get_upvote_count(self, obj):
+        print(obj.no_of_upvotes())
+        return obj.no_of_upvotes()
     class Meta:
         model = Post
         fields = "__all__"
+        depth = 1
 
 class PostCreateSerializer(serializers.ModelSerializer):
-    # title = serializers.CharField(
-    #     required = True
-    # )
+    # posted_by = 
     content = serializers.CharField(
         required = True
     )
@@ -33,3 +36,4 @@ class PostCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = "__all__"
+        depth = 1
