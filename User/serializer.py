@@ -6,6 +6,8 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from .models import UserProfile
 
+from Tag.models import Tag
+
 
 from rest_framework import serializers
 from .models import UserProfile
@@ -39,9 +41,13 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     username = serializers.SlugRelatedField(slug_field='username', read_only=True)
+    tagcount = serializers.SerializerMethodField('get_tag_count', read_only=True)
+
+    def get_tag_count(self, obj):
+        return Tag.objects.filter(created_by = obj).count()
     class Meta:
         model = UserProfile
-        fields = ['username', 'id', 'first_name', 'last_name','email']
+        fields = ['username', 'id', 'first_name', 'last_name','email', 'tagcount']
 
 class UserPublicProfileSerializer(serializers.ModelSerializer):
     username = serializers.SlugRelatedField(slug_field='username', read_only=True)

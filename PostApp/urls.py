@@ -9,7 +9,10 @@ urlpatterns = [
     path('detail/<int:pk>', views.Post_detail_view, name='PostInfoAPI'),
     path('self/', views.SelfPostListCreateView.as_view(), name = 'SelfPostListcreateView'),
     path('list/<int:id>', views.TagPosts.as_view(), name = 'TagPosts'),
-    path('upvoted_by/<int:id>', views.UserLikedPosts.as_view(), name = 'UserLikedPosts'),
+    path('upvoted_by/', views.UserLikedPosts.as_view(), name = 'UserLikedPosts'),
     path('upvote/<int:id>', views.UpvotePost.as_view(), name = 'UpvotePost'),
     path('downvote/<int:id>', views.DownvotePost.as_view(), name = 'DownvotePost'),
+    path('trending-date/', views.TrendingPostbyDate.as_view(), name = 'TrendingPostbyDate'),
+    path('trending-upvotes/', views.TrendingPostByUpvoteCount.as_view(), name = 'TrendingPostbyUpvoteCount'),
+
 ]

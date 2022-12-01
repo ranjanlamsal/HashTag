@@ -19,6 +19,7 @@ from rest_framework.parsers import MultiPartParser
 
 
 class PostListAPIView(generics.ListAPIView):
+    #list post in order of id
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     authentication_classes = [
@@ -28,7 +29,23 @@ class PostListAPIView(generics.ListAPIView):
     permission_classes = [permissions.DjangoModelPermissions]
 Post_list_view = PostListAPIView.as_view()
 
+
+class TrendingPostbyDate(APIView):
+    def get(self, request):
+        posts = Post.objects.all().order_by('created_at')
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data)
+
+
+class TrendingPostByUpvoteCount(APIView):
+    def get(self, request):
+        posts = sorted(Post.objects.all(), key=lambda i: i.no_of_upvotes(), reverse=True)
+        serializer = PostSerializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+
 class PostDetailAPIView(generics.RetrieveAPIView):
+    #detail of a post(lookup field = postid)
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     authentication_classes = [
@@ -41,6 +58,7 @@ Post_detail_view = PostDetailAPIView.as_view()
 
 
 class SelfPostListCreateView(APIView):
+    #selfpostlistcreate
     parser_classes = [MultiPartParser]
     def post(self, request):
         user = UserProfile.objects.get(username = self.request.user)
@@ -68,6 +86,7 @@ class SelfPostListCreateView(APIView):
         return Response(serializer.data)
 
 class SelfPostUpdateView(APIView):
+    #self post update
     def put(self, request, id):
         post = get_post(id)
         if not post:
@@ -113,26 +132,42 @@ class SelfPostUpdateView(APIView):
             )
 
 class PostView(APIView):
-    parser_classes = [MultiPartParser]
+    #post create view
+    # parser_classes = [MultiPartParser]
     def post(self, request):
-        user = UserProfile.objects.get(username = self.request.user)
+        user = UserProfile.objects.get(username = request.user)
+        tag_id = request.data['tag_id']
+        print(tag_id)
+        tag = get_tag(tag_id)
 
-        serializer = PostCreateSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=ValueError):
-            serializer.save(posted_by = user)
+        if(tag is not None):
+            serializer = PostCreateSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=ValueError):
+                serializer.save(posted_by = user, tag = Tag.objects.get(id=tag_id))
+                return Response(
+                        serializer.data,
+                        status=status.HTTP_201_CREATED,
+                    )
             return Response(
-                    serializer.data,
-                    status=status.HTTP_201_CREATED,
-                )
+                    {
+                        "error":True,
+                        "error_msg": serializer.error_messages,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
         return Response(
-               {
-                   "error":True,
-                   "error_msg": serializer.error_messages,
-               },
-               status=status.HTTP_400_BAD_REQUEST
-               )
+            {
+                "error":"Invalid Tag"
+            },
+            status = status.HTTP_400_BAD_REQUEST
+        )
 
-
+def get_tag(id):
+    try:
+        tag = Tag.objects.get(id=id)
+    except Tag.DoesNotExist:
+        return False
+    return tag
 
 def get_post(id):
     try:
@@ -143,6 +178,7 @@ def get_post(id):
 
 
 class TagPosts(APIView):
+    #post of a partip=cular tag
     def get(self, request, id):
         tag = Tag.objects.get(id=id)
         posts = Post.objects.filter(tag = tag)
@@ -151,8 +187,9 @@ class TagPosts(APIView):
 
 
 class UserLikedPosts(APIView):
-    def get(self, request, id):
-        user = UserProfile.objects.get(id = id)
+    #user liked posts
+    def get(self, request):
+        user = UserProfile.objects.get(username = request.user)
         posts = Post.objects.filter(upvote_users = user)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)

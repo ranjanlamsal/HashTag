@@ -1,7 +1,9 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import UserProfile
 from .serializer import UserSerializer, UserProfileSerializer
 from django.contrib.auth.models import User
+from PostApp.models import Post
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -22,17 +24,65 @@ class UserRecordView(APIView):
     """
     def post(self, request):
         """make post request with user info to register"""
+        
+        email = request.data["email"]
+        username = request.data["username"]
+        user = User.objects.filter(email = email)
+        user1 = User.objects.filter(username = username)
+        if request.data["username"] is None:
+            return JsonResponse(
+                    {
+                        "error": "username Required.",
+                        "status" : status.HTTP_204_NO_CONTENT
+                    }
+                    # status = status.HTTP_204_NO_CONTENT
+            )
+        if request.data["first_name"] is None:
+            return JsonResponse(
+                    {
+                        "error": "First Name Required.",
+                        "status" : status.HTTP_204_NO_CONTENT
+                        
+                    }
+                    # status = status.HTTP_204_NO_CONTENT
+            )
+        if request.data["last_name"] is None:
+            return JsonResponse(
+                    {
+                        "error": "Last Name Required.",
+                        "status" : status.HTTP_204_NO_CONTENT
+                    }
+                    # status = status.HTTP_204_NO_CONTENT
+            )
+        if request.data["email"] is None:
+            return JsonResponse(
+                    {
+                        "error": "email Required.",
+                        "status" : status.HTTP_204_NO_CONTENT
+                    }
+                    # status = status.HTTP_204_NO_CONTENT
+            )
+        if user:
+            return JsonResponse(
+                    {
+                        "error": "A user with that email already exists.",
+                        "status" : status.HTTP_400_BAD_REQUEST
+                    }
+                    # status = status.HTTP_400_BAD_REQUEST
+                )
+        if user1:
+            return JsonResponse({
+                        "error": "A user with that username already exists.",
+                        "status" : status.HTTP_400_BAD_REQUEST
+                    }
+                    # status = status.HTTP_400_BAD_REQUEST
+                    )
+
+
         request.data["username"] = request.data["username"].lower()
         request.data["first_name"] = request.data["first_name"].title()
         request.data["last_name"] = request.data["last_name"].title()
-        email = request.data["email"]
-        user = User.objects.filter(email = email)
-        if user:
-            return Response(
-                    {
-                        "email": ["A user with that email already exists."]
-                    }
-                )
+
         serializer = UserSerializer(data = request.data)
         if serializer.is_valid(raise_exception=ValueError):
             serializer.create(validated_data=request.data)
@@ -42,12 +92,13 @@ class UserRecordView(APIView):
                     update_data,
                     status=status.HTTP_201_CREATED,
                 )
-        return Response(
+        return JsonResponse(
                {
                    "error":True,
-                   "error_msg": serializer.error_messages,
-               },
-               status=status.HTTP_400_BAD_REQUEST
+                   "error_msg": "Bad Request",
+                   "status" : status.HTTP_400_BAD_REQUEST
+               }
+               
                )
 
 
@@ -56,7 +107,6 @@ class UserProfileInfoView(APIView):
         user = get_object(request)
         user_email = request.user.email
         serializer = UserProfileSerializer(user).data
-        print(request.user.username)
         return Response(serializer)
 
     def put(self, request):
@@ -77,31 +127,18 @@ class UserProfileInfoView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
 def get_object(request):
-    try:
-        user = request.user
-        return get_object_or_404(UserProfile, username=user)
-        #return Traveller.objects.get(username=user)
-    except UserProfile.DoesNotExist:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-class UserDetailAPIView(generics.RetrieveAPIView):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+        try:
+            user = request.user
+            return get_object_or_404(UserProfile, username=user)
+            #return Traveller.objects.get(username=user)
+        except UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+# class UserListAPIView(generics.ListAPIView):
 
-    authentication_classes = [
-        authentication.SessionAuthentication,
-        authentication.TokenAuthentication,
-    ]
-
-    permission_classes = [permissions.IsAdminUser, IsStaffEditorPermission]
-
-user_detail_view = UserDetailAPIView.as_view()
-
-class UserListAPIView(generics.ListAPIView):
-
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
+#     queryset = UserProfile.objects.all()
+#     serializer_class = UserProfileSerializer
     # authentication_classes = [
     #     authentication.SessionAuthentication,
     #     authentication.TokenAuthentication,
@@ -110,7 +147,6 @@ class UserListAPIView(generics.ListAPIView):
     # permission_classes = [permissions.DjangoModelPermissions]
     
 
-userlistview = UserListAPIView.as_view()
 
 
 # class UserUpdaeteDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):

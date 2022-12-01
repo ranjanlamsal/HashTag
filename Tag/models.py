@@ -17,11 +17,12 @@ class Tag(models.Model):
         return self.title
 
     def get_followers(self):
-        follower = [x.userProfile_id.username.username for x in self.followers.all()]
+        follower = [x.followerUser.username.username for x in self.followers.all()]
         return follower
 
     def get_follower_count(self):
         return len(self.get_followers())
+    
 
 
         
@@ -57,7 +58,7 @@ class UserTagFollowing(models.Model):
     followers +
     """
 
-    userProfile_id = models.ForeignKey(
+    followerUser = models.ForeignKey(
             UserProfile,
             on_delete=models.CASCADE,
             related_name="following"
@@ -68,4 +69,4 @@ class UserTagFollowing(models.Model):
             related_name="followers"
         )
     class Meta:
-        unique_together = ('userProfile_id', 'following_tag_id',)
+        unique_together = ('followerUser', 'following_tag_id',)

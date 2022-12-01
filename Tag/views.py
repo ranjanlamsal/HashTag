@@ -32,12 +32,18 @@ class TagView(APIView):
                },
                status=status.HTTP_400_BAD_REQUEST
                )
+class SelfTagGetView(APIView):
+    def get(self, request):
+        user = UserProfile.objects.get(username = request.user)
+        tags = Tag.objects.filter(created_by = user)
+        serializer = TagSerializer(tags, many=True)
+        return Response(serializer.data)
 
 class SelfTagView(APIView):
     def get(self, request, id):
         user = UserProfile.objects.get(username = request.user)
-        tags = Tag.objects.filter(created_by = user)
-        serializer = TagSerializer(tags, many=True)
+        tag = Tag.objects.filter(id = id)
+        serializer = TagSerializer(tag)
         return Response(serializer.data)
 
     def put(self, request, id):
@@ -117,15 +123,15 @@ class FollowTagView(APIView):
     def post(self, request, id):
         user = UserProfile.objects.get(username = request.user)
         tag = Tag.objects.get(id = id)
-        # print(tag.get_followers())
-        
-        if(user.username in tag.get_followers()):
-            for entry in tag.followers.all():
-                entry.remove()
+        followers_entry = tag.followers.all()
+        follower_list = list()
+        for entry in followers_entry:
+            if(user == entry.followerUser):
+                entry.delete()
+                return Response(status = status.HTTP_200_OK,)
             # tag.followers.userProfile_id.remove(user)
-        else:
-            UserTagFollowing.add(userProfile_id= user, following_tag_id=tag)
-            
-        return Response(status=status.HTTP_400_BAD_REQUEST)
-        serializer = TagSerializer(tag)
-        return Response(serializer.data)
+        
+        new_entry = UserTagFollowing(followerUser= user, following_tag_id=tag)
+        new_entry.save()
+        return Response(status = status.HTTP_200_OK)
+

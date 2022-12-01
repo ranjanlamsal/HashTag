@@ -28,12 +28,11 @@ class PostCreateSerializer(serializers.ModelSerializer):
     content = serializers.CharField(
         required = True
     )
-    tag = serializers.PrimaryKeyRelatedField(
-        queryset = Tag.objects.all(),
-        required = True,
-        many = False
-    )
+    # tag = serializers.PrimaryKeyRelatedField(
+    #     queryset = Tag.objects.all(),
+    #     required = True,
+    #     many = False
+    # )
     class Meta:
         model = Post
-        fields = "__all__"
-        depth = 1
+        fields = ['content']
