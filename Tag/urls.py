@@ -9,5 +9,6 @@ urlpatterns = [
     path('detail/<int:pk>/', views.TagDetailAPIView.as_view(), name = "TagDetailView"),
     path('followers/<str:tagname>/',views.GetTagFollowers.as_view(), name = "TagFollowers"),
     path('followtag/<int:id>/', views.FollowTagView.as_view(), name='followtag'),
+    path('trending/',views.TrendingTags.as_view(), name='trendingtags'),
     
 ]

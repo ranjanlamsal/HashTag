@@ -104,10 +104,14 @@ class UserRecordView(APIView):
 
 class UserProfileInfoView(APIView):
     def get(self, request):
-        user = get_object(request)
-        user_email = request.user.email
-        serializer = UserProfileSerializer(user).data
-        return Response(serializer)
+        user =UserProfile.objects.get(username = request.user)
+        if user in UserProfile.objects.all():
+            user_email = request.user.email
+            serializer = UserProfileSerializer(user).data
+            return Response(serializer)
+        return JsonResponse({
+            "error": "Invalid User"
+        })
 
     def put(self, request):
         user = get_object(request)
@@ -131,7 +135,9 @@ class UserProfileInfoView(APIView):
 def get_object(request):
         try:
             user = request.user
+            print(user.username)
             return get_object_or_404(UserProfile, username=user)
+            print(user.username)
             #return Traveller.objects.get(username=user)
         except UserProfile.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)

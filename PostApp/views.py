@@ -1,7 +1,8 @@
+import random
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Post
+from .models import Comment, Post
 from django.http import Http404, HttpResponseBadRequest
-from PostApp.serializer import PostCreateSerializer, PostSerializer
+from PostApp.serializer import CommentSerializer, PostCreateSerializer, PostSerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -10,6 +11,7 @@ from rest_framework import generics
 
 from Tag.models import Tag
 from User.models import UserProfile
+from django.contrib.auth.models import User
 
 from Tag.serializer import TagSerializer
 from rest_framework import status
@@ -29,6 +31,17 @@ class PostListAPIView(generics.ListAPIView):
     permission_classes = [permissions.DjangoModelPermissions]
 Post_list_view = PostListAPIView.as_view()
 
+class PostRandomListView(APIView):
+    def get(self, request):
+        user = UserProfile.objects.get(username=request.user)
+        if(user in UserProfile.objects.all()):
+            posts = Post.objects.all()
+            random_posts = random.sample(list(posts), k = posts.count())
+            serializer = PostSerializer(random_posts, many = True)
+            return Response(serializer.data)
+        return Response({
+            "error":"invalid_user"
+        })
 
 class TrendingPostbyDate(APIView):
     def get(self, request):
@@ -216,3 +229,93 @@ class DownvotePost(APIView):
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
+
+def get_user(user):
+    try:
+        user = UserProfile.objects.get(username = user)
+    except UserProfile.DoesNotExist:
+        return None
+    return user
+
+class CommentView(APIView):
+    def post(self, request, id):
+        """ here id is post id """
+        post = get_post(id)
+        if not post:
+            return Response(
+                    {
+                        "error": True,
+                        "error_msg": "Post not found"
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        user = UserProfile.objects.get(username=request.user)
+        serializer = CommentSerializer(data = request.data)
+        if serializer.is_valid(raise_exception = ValueError):
+            comment = serializer.save(post_id=post, commented_by=user)
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        return Response(
+               {
+                   "error":True,
+                   "error_msg": serializer.error_messages,
+               },
+               status=status.HTTP_400_BAD_REQUEST
+               )
+
+    def put(self, request, id):
+        """ here id is comment id """
+        try:
+            comment = Comment.objects.get(id=id)
+        except Comment.DoesNotExist:
+            return Response(
+                    {
+                        "error": True,
+                        "error_msg": "Comment not found"
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        if comment.commented_by == UserProfile.objects.get(username = request.user):
+            serializer = CommentSerializer(comment, request.data)
+        else:
+            return Response(
+                    {
+                        "error": True,
+                        "error_msg": "Not commented by you"
+                    },
+                    status = status.HTTP_401_UNAUTHORIZED
+                )
+
+        if serializer.is_valid(raise_exception = ValueError):
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_200_OK)
+        return Response(
+               {
+                   "error":True,
+                   "error_msg": serializer.error_messages,
+               },
+               status=status.HTTP_400_BAD_REQUEST
+           )
+
+    def delete(self, request, id):
+        try:
+            comment = Comment.objects.get(id=id)
+        except Comment.DoesNotExist:
+            return Response(
+                    {
+                        "error": True,
+                        "error_msg": "Comment not found"
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        if comment.commented_by == UserProfile.objects.get(username = request.user):
+            comment.delete()
+            return Response({"success":"comment deleted"},
+                    status = status.HTTP_200_OK
+                )
+        return Response(
+                {
+                    "error": True,
+                    "error_msg": "Not commented by you"
+                },
+                status = status.HTTP_401_UNAUTHORIZED
+            )
