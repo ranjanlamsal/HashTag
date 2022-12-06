@@ -3,7 +3,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.PostView.as_view(), name='UpdateSelfPostsAPI'),#
+    path('<int:id>/', views.PostView.as_view(), name='UpdateSelfPostsAPI'),#
     path('update/<int:id>', views.SelfPostUpdateView.as_view(), name='SelfPostUpdateView'),
     # path('list/', views.Post_list_view, name='PostList'),#
     path('list/', views.PostRandomListView.as_view(), name='PostRandomListView'),

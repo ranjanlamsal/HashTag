@@ -2,7 +2,8 @@ import random
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Comment, Post
 from django.http import Http404, HttpResponseBadRequest
-from PostApp.serializer import CommentSerializer, PostCreateSerializer, PostSerializer
+from .serializer import CommentSerializer, PostCreateSerializer, PostSerializer
+# from .serializer import CommentSerializer
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -72,9 +73,9 @@ Post_detail_view = PostDetailAPIView.as_view()
 
 class SelfPostListCreateView(APIView):
     #selfpostlistcreate
-    parser_classes = [MultiPartParser]
+    # parser_classes = [MultiPartParser]
     def post(self, request):
-        user = UserProfile.objects.get(username = self.request.user)
+        user = UserProfile.objects.get(username = request.user)
 
         serializer = PostCreateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=ValueError):
@@ -93,7 +94,7 @@ class SelfPostListCreateView(APIView):
 
     def get(self, request):
         user = UserProfile.objects.get(username = request.user)
-        print(user)
+        # print(user)
         posts = Post.objects.filter(posted_by = user)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
@@ -147,33 +148,38 @@ class SelfPostUpdateView(APIView):
 class PostView(APIView):
     #post create view
     # parser_classes = [MultiPartParser]
-    def post(self, request):
+    def post(self, request, id):
         user = UserProfile.objects.get(username = request.user)
-        tag_id = request.data['tag_id']
-        print(tag_id)
-        tag = get_tag(tag_id)
-
-        if(tag is not None):
-            serializer = PostCreateSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=ValueError):
-                serializer.save(posted_by = user, tag = Tag.objects.get(id=tag_id))
+        tag =Tag.objects.get(id = id)
+        followers = tag.get_followers()
+        # tag_id = request.data['tag_id']
+        # print(tag_id)
+        # tag = get_tag(tag_id)
+        if(user.username.username in followers):
+            if(tag is not None):
+                serializer = PostCreateSerializer(data=request.data)
+                if serializer.is_valid(raise_exception=ValueError):
+                    serializer.save(posted_by = user, tag = Tag.objects.get(id=id))
+                    return Response(
+                            serializer.data,
+                            status=status.HTTP_201_CREATED,
+                        )
                 return Response(
-                        serializer.data,
-                        status=status.HTTP_201_CREATED,
-                    )
+                        {
+                            "error":True,
+                            "error_msg": serializer.error_messages,
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                        )
             return Response(
-                    {
-                        "error":True,
-                        "error_msg": serializer.error_messages,
-                    },
-                    status=status.HTTP_400_BAD_REQUEST
-                    )
-        return Response(
-            {
-                "error":"Invalid Tag"
-            },
-            status = status.HTTP_400_BAD_REQUEST
-        )
+                {
+                    "error":"Invalid Tag"
+                },
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        return Response({
+            "error":"Follow Tag Before Posting"
+        })
 
 def get_tag(id):
     try:
@@ -191,12 +197,18 @@ def get_post(id):
 
 
 class TagPosts(APIView):
-    #post of a partip=cular tag
+    #post of a particular tag
     def get(self, request, id):
-        tag = Tag.objects.get(id=id)
-        posts = Post.objects.filter(tag = tag)
-        serializer = PostSerializer(posts, many=True)
-        return Response(serializer.data)
+        user = UserProfile.objects.get(username= request.user)
+        if(user):
+            tag = Tag.objects.get(id=id)
+            posts = Post.objects.filter(tag = tag)
+            serializer = PostSerializer(posts, many=True)
+            # tagserializer = TagSerializer(tag, many=True)
+            return Response(serializer.data)
+        return Response({
+            "error": "invalid_user"
+        })
 
 
 class UserLikedPosts(APIView):
@@ -207,14 +219,26 @@ class UserLikedPosts(APIView):
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
+# class UpvoteDownvoteSignal(APIView):
+#     def get(self, request):
+#         user = UserProfile.objects.get(username = request.user)
+        
+
 class UpvotePost(APIView):
     def post(self, request, id):
         user = UserProfile.objects.get(username = request.user)
         post = Post.objects.get(id = id)
         if(user in post.downvote_users.all()):
             post.downvote_users.remove(user)
-        else:
             post.upvote_users.add(user)
+            serializer = PostSerializer(post)
+            return Response(serializer.data)
+        if(user in post.upvote_users.all()):
+            post.upvote_users.remove(user)
+            serializer = PostSerializer(post)
+            return Response(serializer.data)
+
+        post.upvote_users.add(user)
         serializer = PostSerializer(post)
         return Response(serializer.data)
 
@@ -224,8 +248,16 @@ class DownvotePost(APIView):
         post = Post.objects.get(id = id)
         if(user in post.upvote_users.all()):
             post.upvote_users.remove(user)
-        else:
-            post.upvote_users.add(user)
+            post.downvote_users.add(user)
+            serializer = PostSerializer(post)
+            return Response(serializer.data)
+            
+        if(user in post.downvote_users.all()):
+            post.downvote_users.remove(user)
+            serializer = PostSerializer(post)
+            return Response(serializer.data)
+
+        post.downvote_users.add(user)
         serializer = PostSerializer(post)
         return Response(serializer.data)
 

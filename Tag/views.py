@@ -1,4 +1,5 @@
 import json
+import random
 from django.shortcuts import redirect, render
 from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from rest_framework.views import APIView
@@ -16,7 +17,7 @@ from rest_framework.parsers import MultiPartParser
 class TagView(APIView):
     # parser_classes = [MultiPartParser]
     def post(self, request):
-        user = UserProfile.objects.get(username = self.request.user)
+        user = UserProfile.objects.get(username = request.user)
 
         serializer = TagCreateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=ValueError):
@@ -74,7 +75,7 @@ class SelfTagView(APIView):
         return Response(status=status.HTTP_401_UNAUTHORIZED)
 
     def delete(self, request, id):
-        tag = get_tag(id)
+        tag = Tag.objects.get(id = id)
         if not tag:
             return Response(
                     {
@@ -100,17 +101,24 @@ class TagListAPIView(generics.ListAPIView):
     serializer_class = TagSerializer
 
 
+class TagDetailAPIView(APIView):
+    def get(self, request,id):
+        user= UserProfile.objects.get(username = request.user)
+        if(user):
+            tag = Tag.objects.get(id = id)
+            serializer = TagSerializer(tag)
+            return Response(serializer.data)
 
-class TagDetailAPIView(generics.RetrieveAPIView):
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-
+        return Response({
+            "error": "invalid_user"
+        })
 class GetTagFollowers(APIView):
     def get(self,request, tagname):
         followers = Tag.objects.get(
                 title = tagname
             ).get_followers()
-        print(followers)
+        # print(followers)
+        # print(type(followers))
         return JsonResponse({"followers": followers})
         # serializer = UserPublicProfileSerializer(followers, many=True)
         # print(serializer.data)
@@ -150,3 +158,36 @@ def get_user(user):
     except UserProfile.DoesNotExist:
         return None
     return user
+
+
+class SuggestedTags(APIView):
+    def get(self, request):
+        user = UserProfile.objects.get(username=request.user)
+        if(user in UserProfile.objects.all()):
+            tags = Tag.objects.all()
+            suggestedtags = []
+            for tag in tags:
+                if user not in tag.get_followers():
+                    suggestedtags.append(tag)
+            # random_posts = random.sample(list(suggestedtags), k = 6)
+            serializer = TagSerializer(suggestedtags, many = True)
+            return Response(serializer.data)
+        return Response({
+            "error":"invalid_user"
+        })
+
+class TagUserFollowSignal(APIView):
+    def get(self, request, id):
+        user = UserProfile.objects.get(username = request.user)
+        tag = Tag.objects.get(id = id)
+        if(user):
+            if(user.username.username in tag.get_followers()):
+                return Response({
+                    "following": True
+                })
+            return Response({
+                "following": False
+            })
+        return Response({
+            "error": "invalid_user"
+        })

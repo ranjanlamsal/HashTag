@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Tag
 from User.models import UserProfile
 from PostApp.models import Post
+from rest_framework.validators import UniqueValidator
 
 class TagSerializer(serializers.ModelSerializer):
     followers = serializers.SerializerMethodField('get_follower_list')
@@ -23,17 +24,21 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = "__all__"
+        fields = ['id', 'title', 'created_by', 'created_at', 'followers', 'follower_count', 'post_count']
         depth = 1
 
 
 class TagCreateSerializer(serializers.ModelSerializer):
-    title = serializers.CharField(max_length=120,
-        required=True)
+    title = serializers.CharField(
+        max_length=120,
+        required=True,
+        validators = [UniqueValidator(queryset=Tag.objects.all())]
+        )
     content = serializers.CharField(
-        required = True
+        required = False
     )
     class Meta:
         model = Tag
         fields = "__all__"
         depth = 1
+        

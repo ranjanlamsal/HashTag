@@ -46,11 +46,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
+    'Comments',
     'api',
     'Tag',
     'User',
     'PostApp',
-    'Comments',
 ]
 
 MIDDLEWARE = [

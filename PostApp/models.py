@@ -1,3 +1,4 @@
+
 from django.db import models
 from Tag.models import Tag
 from User.models import UserProfile
@@ -18,10 +19,15 @@ class Post(models.Model):
 
     def no_of_upvotes(self):
         upvote = self.upvote_users.all().count()
-        downvote = self.downvote_users.all().count()
         # print(f"{upvote=} {downvote=}")
-        return (upvote - downvote)
+        return (upvote)
+    
+    def no_of_downvotes(self):
+        downvote = self.downvote_users.all().count()
+        return (downvote)
 
+    def get_tag(self):
+        return self.tag
 class Comment(models.Model):
     post_id=models.ForeignKey(Post, on_delete=models.CASCADE, 
             related_name='comments')
