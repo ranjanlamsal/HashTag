@@ -24,7 +24,7 @@ class UserProfile(models.Model):
 
     def __str__(self):
         id = self.id
-        return f"{self.username.username}({id})"
+        return f"{self.username}({id})"
 
     def get_username(self):
         return self.username.username
@@ -56,6 +56,9 @@ class UserProfile(models.Model):
             "posts" : self.get_posts,
             "hashtags": self.get_hashtags,
         }
+
+    def __str__(self) -> str:
+        return self.username.username
 
 def edit_or_create_userProfile(sender, instance, **kwargs):
     user = UserProfile.objects.filter(username=instance)

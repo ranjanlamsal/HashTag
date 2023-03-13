@@ -2,7 +2,7 @@ import random
 from django.shortcuts import get_object_or_404, redirect, render
 from .models import Comment, Post
 from django.http import Http404, HttpResponseBadRequest
-from .serializer import CommentSerializer, PostCreateSerializer, PostSerializer
+from .serializer import CommentSerializer, PostSerializer
 # from .serializer import CommentSerializer
 
 from rest_framework.views import APIView
@@ -17,12 +17,51 @@ from django.contrib.auth.models import User
 from Tag.serializer import TagSerializer
 from rest_framework import status
 from rest_framework import authentication, permissions
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser
 
+class PostView(APIView):
+    #post create view
 
+    parser_classes = [MultiPartParser, FormParser]
+    
+    def post(self, request, id):
+        user = UserProfile.objects.get(username = request.user)
+        tag =Tag.objects.get(id = id)
+        followers = tag.get_followers()
+        # tag_id = request.data['tag_id']
+        # print(tag_id)
+        # tag = get_tag(tag_id)
+        if(user.username.username in followers):
+            if(tag is not None):
+                serializer = PostSerializer(data=request.data)
+                if serializer.is_valid(raise_exception=ValueError):
+                    serializer.save(posted_by = user, tag = Tag.objects.get(id=id))
+                    return Response(
+                            serializer.data,
+                            status=status.HTTP_201_CREATED,
+                        )
+                return Response(
+                        {
+                            "error":True,
+                            "error_msg": serializer.error_messages,
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                        )
+            return Response(
+                {
+                    "error":"Invalid Tag"
+                },
+                status = status.HTTP_400_BAD_REQUEST
+            )
+        return Response({
+            "error":"Follow Tag Before Posting"
+        })
 
 class PostListAPIView(generics.ListAPIView):
     #list post in order of id
+
+    parser_classes = [MultiPartParser]
+    
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     authentication_classes = [
@@ -33,6 +72,7 @@ class PostListAPIView(generics.ListAPIView):
 Post_list_view = PostListAPIView.as_view()
 
 class PostRandomListView(APIView):
+    parser_classes = [MultiPartParser]
     def get(self, request):
         user = UserProfile.objects.get(username=request.user)
         if(user in UserProfile.objects.all()):
@@ -45,6 +85,7 @@ class PostRandomListView(APIView):
         })
 
 class TrendingPostbyDate(APIView):
+    parser_classes = [MultiPartParser]
     def get(self, request):
         posts = Post.objects.all().order_by('created_at')
         serializer = PostSerializer(posts, many=True)
@@ -52,6 +93,7 @@ class TrendingPostbyDate(APIView):
 
 
 class TrendingPostByUpvoteCount(APIView):
+    parser_classes = [MultiPartParser]
     def get(self, request):
         posts = sorted(Post.objects.all(), key=lambda i: i.no_of_upvotes(), reverse=True)
         serializer = PostSerializer(posts, many=True)
@@ -59,7 +101,8 @@ class TrendingPostByUpvoteCount(APIView):
         
 
 class PostDetailAPIView(generics.RetrieveAPIView):
-    #detail of a post(lookup field = postid)
+    parser_classes = [MultiPartParser]
+    
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     authentication_classes = [
@@ -72,12 +115,12 @@ Post_detail_view = PostDetailAPIView.as_view()
 
 
 class SelfPostListCreateView(APIView):
-    #selfpostlistcreate
-    # parser_classes = [MultiPartParser]
+    
+    parser_classes = [MultiPartParser]
     def post(self, request):
         user = UserProfile.objects.get(username = request.user)
 
-        serializer = PostCreateSerializer(data=request.data)
+        serializer = PostSerializer(data=request.data)
         if serializer.is_valid(raise_exception=ValueError):
             serializer.save(posted_by = user)
             return Response(
@@ -100,13 +143,14 @@ class SelfPostListCreateView(APIView):
         return Response(serializer.data)
 
 class SelfPostUpdateView(APIView):
+    parser_classes = [MultiPartParser]
     #self post update
     def put(self, request, id):
         post = get_post(id)
         if not post:
             return Response(status=status.HTTP_404_NOT_FOUND)
         if post.posted_by == UserProfile.objects.get(username = request.user):
-            serializer = PostCreateSerializer(post, data=request.data,)
+            serializer = PostSerializer(post, data=request.data,)
             request.data._mutable = True
         
             if serializer.is_valid(raise_exception = ValueError):
@@ -145,41 +189,6 @@ class SelfPostUpdateView(APIView):
                 status = status.HTTP_401_UNAUTHORIZED
             )
 
-class PostView(APIView):
-    #post create view
-    # parser_classes = [MultiPartParser]
-    def post(self, request, id):
-        user = UserProfile.objects.get(username = request.user)
-        tag =Tag.objects.get(id = id)
-        followers = tag.get_followers()
-        # tag_id = request.data['tag_id']
-        # print(tag_id)
-        # tag = get_tag(tag_id)
-        if(user.username.username in followers):
-            if(tag is not None):
-                serializer = PostCreateSerializer(data=request.data)
-                if serializer.is_valid(raise_exception=ValueError):
-                    serializer.save(posted_by = user, tag = Tag.objects.get(id=id))
-                    return Response(
-                            serializer.data,
-                            status=status.HTTP_201_CREATED,
-                        )
-                return Response(
-                        {
-                            "error":True,
-                            "error_msg": serializer.error_messages,
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                        )
-            return Response(
-                {
-                    "error":"Invalid Tag"
-                },
-                status = status.HTTP_400_BAD_REQUEST
-            )
-        return Response({
-            "error":"Follow Tag Before Posting"
-        })
 
 def get_tag(id):
     try:
@@ -197,6 +206,7 @@ def get_post(id):
 
 
 class TagPosts(APIView):
+    parser_classes = [MultiPartParser]
     #post of a particular tag
     def get(self, request, id):
         user = UserProfile.objects.get(username= request.user)
@@ -212,6 +222,7 @@ class TagPosts(APIView):
 
 
 class UserLikedPosts(APIView):
+    parser_classes = [MultiPartParser]
     #user liked posts
     def get(self, request):
         user = UserProfile.objects.get(username = request.user)
@@ -281,18 +292,21 @@ class CommentView(APIView):
                     },
                     status=status.HTTP_404_NOT_FOUND
                 )
-        user = UserProfile.objects.get(username=request.user)
-        serializer = CommentSerializer(data = request.data)
+        data = request.data
+        commented_by = UserProfile.objects.get(username=request.user)
+        # self.post_id = id
+        serializer = CommentSerializer(data = request.data, remove_fields = ['commented_by', 'post'])
         if serializer.is_valid(raise_exception = ValueError):
-            comment = serializer.save(post_id=post, commented_by=user)
-            return Response(serializer.data, status = status.HTTP_201_CREATED)
+            comment = serializer.save(post = post, commented_by=commented_by)
+            return Response(CommentSerializer(comment).data, status = status.HTTP_200_OK)
         return Response(
                {
                    "error":True,
                    "error_msg": serializer.error_messages,
                },
                status=status.HTTP_400_BAD_REQUEST
-               )
+           )
+    
 
     def put(self, request, id):
         """ here id is comment id """

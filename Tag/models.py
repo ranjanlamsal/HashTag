@@ -23,6 +23,9 @@ class Tag(models.Model):
     def get_follower_count(self):
         return len(self.get_followers())
     
+    def created_by_username(self):
+        return self.created_by.username.username
+    
 
 
         

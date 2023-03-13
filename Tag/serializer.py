@@ -24,8 +24,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ['id', 'title', 'created_by', 'created_at', 'followers', 'follower_count', 'post_count']
-        depth = 1
+        fields = ['id', 'title', 'created_by_username', 'created_at', 'followers', 'follower_count', 'post_count']
 
 
 class TagCreateSerializer(serializers.ModelSerializer):
@@ -40,5 +39,4 @@ class TagCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
         fields = "__all__"
-        depth = 1
         

@@ -40,6 +40,14 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    def __init__(self, instance=None,**kwargs):
+        remove_fields = kwargs.pop('remove_fields',None)
+        super(UserProfileSerializer,self).__init__(instance,**kwargs)
+
+        if remove_fields:
+            #for multiple fields in a list
+            for field_name in remove_fields:
+                self.fields.pop(field_name)
     username = serializers.SlugRelatedField(slug_field='username', read_only=True)
     tagcount = serializers.SerializerMethodField('get_tag_count', read_only=True)
 
@@ -49,12 +57,12 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = UserProfile
         fields = ['username', 'id', 'first_name', 'last_name','email', 'tagcount']
 
-class UserPublicProfileSerializer(serializers.ModelSerializer):
-    username = serializers.SlugRelatedField(slug_field='username', read_only=True)
-    class Meta:
-        model = UserProfile
-        fields = ['username', 'id', 'first_name', 'last_name']
-        depth = 1
+# class UserPublicProfileSerializer(serializers.ModelSerializer):
+#     username = serializers.SlugRelatedField(slug_field='username', read_only=True)
+#     class Meta:
+#         model = UserProfile
+#         fields = ['username', 'id', 'first_name', 'last_name']
+#         depth = 1
 
 
 

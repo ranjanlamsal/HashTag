@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import  Tag, UserTagFollowing
 from User.models import UserProfile
-from User.serializer import UserProfileSerializer, UserPublicProfileSerializer
+from User.serializer import UserProfileSerializer
 from .serializer import TagSerializer, TagCreateSerializer
 from rest_framework import status
 
