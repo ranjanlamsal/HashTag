@@ -295,7 +295,7 @@ class CommentView(APIView):
         data = request.data
         commented_by = UserProfile.objects.get(username=request.user)
         # self.post_id = id
-        serializer = CommentSerializer(data = request.data, remove_fields = ['commented_by', 'post'])
+        serializer = CommentSerializer(data = request.data, remove_fields = ['commented_by_user', 'post'])
         if serializer.is_valid(raise_exception = ValueError):
             comment = serializer.save(post = post, commented_by=commented_by)
             return Response(CommentSerializer(comment).data, status = status.HTTP_200_OK)
@@ -321,7 +321,7 @@ class CommentView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
         if comment.commented_by == UserProfile.objects.get(username = request.user):
-            serializer = CommentSerializer(comment, request.data)
+            serializer = CommentSerializer(comment, request.data, remove_fields = ['commented_by_user', 'post'])
         else:
             return Response(
                     {

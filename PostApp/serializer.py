@@ -27,7 +27,7 @@ class CommentSerializer(ModelSerializer):
     comment = serializers.CharField(required=True)
     class Meta:
         model = Comment
-        fields= ['id','comment', 'commented_by','post', 'comment_time']
+        fields= ['id','comment', 'commented_by_user','post', 'comment_time']
 
 class PostSerializer(serializers.ModelSerializer):
     upvote_count = serializers.SerializerMethodField('get_upvote_count')

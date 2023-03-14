@@ -50,4 +50,4 @@ class Comment(models.Model):
         return f"comment({self.id}) by {self.commented_by} in {self.post}"
     
     def commented_by_user(self):
-        return self.commented_by.username
+        return self.commented_by.username.username
