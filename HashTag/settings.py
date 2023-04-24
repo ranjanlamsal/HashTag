@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'cloudinary_storage',
-    'Comments',
     'api',
     'Tag',
     'User',
