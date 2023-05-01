@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import  Tag, UserTagFollowing
 from User.models import UserProfile
-from User.serializer import UserProfileSerializer
+# from User.serializer import UserProfileSerializer
 from .serializer import TagSerializer, TagCreateSerializer
 from rest_framework import status
 
@@ -17,7 +17,7 @@ from rest_framework.parsers import MultiPartParser
 class TagView(APIView):
     # parser_classes = [MultiPartParser]
     def post(self, request):
-        user = UserProfile.objects.get(username = request.user)
+        user = UserProfile.objects.get(username = request.username)
 
         serializer = TagCreateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=ValueError):

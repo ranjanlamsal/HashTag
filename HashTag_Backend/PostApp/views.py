@@ -1,8 +1,8 @@
 import random
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Comment, Post
+from .models import Comment, Post,Reply
 from django.http import Http404, HttpResponseBadRequest
-from .serializer import CommentSerializer, PostSerializer
+from .serializer import CommentSerializer, PostSerializer, ReplySerializer
 # from .serializer import CommentSerializer
 
 from rest_framework.views import APIView
@@ -18,6 +18,10 @@ from Tag.serializer import TagSerializer
 from rest_framework import status
 from rest_framework import authentication, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import generics
+
+from rest_framework.permissions import AllowAny
+from rest_framework import viewsets
 
 class PostView(APIView):
     #post create view
@@ -31,7 +35,7 @@ class PostView(APIView):
         # tag_id = request.data['tag_id']
         # print(tag_id)
         # tag = get_tag(tag_id)
-        if(user.username.username in followers):
+        if(user.username in followers):
             if(tag is not None):
                 serializer = PostSerializer(data=request.data)
                 if serializer.is_valid(raise_exception=ValueError):
@@ -72,9 +76,11 @@ class PostListAPIView(generics.ListAPIView):
 Post_list_view = PostListAPIView.as_view()
 
 class PostRandomListView(APIView):
+    
+    
     parser_classes = [MultiPartParser]
     def get(self, request):
-        user = UserProfile.objects.get(username=request.user)
+        user = UserProfile.objects.get(username = request.user)
         if(user in UserProfile.objects.all()):
             posts = Post.objects.all()
             random_posts = random.sample(list(posts), k = posts.count())
@@ -208,10 +214,10 @@ def get_post(id):
 class TagPosts(APIView):
     parser_classes = [MultiPartParser]
     #post of a particular tag
-    def get(self, request, id):
+    def get(self, request, title):
         user = UserProfile.objects.get(username= request.user)
         if(user):
-            tag = Tag.objects.get(id=id)
+            tag = Tag.objects.get(title=title)
             posts = Post.objects.filter(tag = tag)
             serializer = PostSerializer(posts, many=True)
             # tagserializer = TagSerializer(tag, many=True)
@@ -281,6 +287,24 @@ def get_user(user):
     return user
 
 class CommentView(APIView):
+    def get(self, request, id):
+        try:
+            post = Post.objects.get(id=id)
+        except Post.DoesNotExist:
+            return Response(
+                {
+                    "error": True,
+                    "error_msg": "Post not found"
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        comments = Comment.objects.filter(post=post)
+        serializer = CommentSerializer(comments, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
     def post(self, request, id):
         """ here id is post id """
         post = get_post(id)
@@ -293,11 +317,11 @@ class CommentView(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
         data = request.data
-        commented_by = UserProfile.objects.get(username=request.user)
+        commentor_by = UserProfile.objects.get(username=request.user)
         # self.post_id = id
-        serializer = CommentSerializer(data = request.data, remove_fields = ['commented_by_user', 'post'])
+        serializer = CommentSerializer(data = request.data, remove_fields = ['commentor_by', 'post'])
         if serializer.is_valid(raise_exception = ValueError):
-            comment = serializer.save(post = post, commented_by=commented_by)
+            comment = serializer.save(post = post, commentor_by=commentor_by)
             return Response(CommentSerializer(comment).data, status = status.HTTP_200_OK)
         return Response(
                {
@@ -307,61 +331,133 @@ class CommentView(APIView):
                status=status.HTTP_400_BAD_REQUEST
            )
     
-
-    def put(self, request, id):
-        """ here id is comment id """
+class ReplyView(APIView):
+    serializer_class = ReplySerializer
+    def get_object(self, pk):
         try:
-            comment = Comment.objects.get(id=id)
-        except Comment.DoesNotExist:
-            return Response(
-                    {
-                        "error": True,
-                        "error_msg": "Comment not found"
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
-        if comment.commented_by == UserProfile.objects.get(username = request.user):
-            serializer = CommentSerializer(comment, request.data, remove_fields = ['commented_by_user', 'post'])
+            return Reply.objects.get(pk=pk)
+        except Reply.DoesNotExist:
+            raise Http404
+
+    def get(self, request, id=None):
+        if id is not None:
+            reply = self.get_object(id)
+            serializer = self.serializer_class(reply)
+            return Response(serializer.data)
         else:
-            return Response(
-                    {
-                        "error": True,
-                        "error_msg": "Not commented by you"
-                    },
-                    status = status.HTTP_401_UNAUTHORIZED
-                )
+            replies = Reply.objects.all()
+            serializer = self.serializer_class(replies, many=True)
+            return Response(serializer.data)
+    def post(self, request, id):
+        serializer = ReplySerializer(data=request.data)
+        if serializer.is_valid():
+            comment = get_object_or_404(Comment, id=id)
+            serializer.save(comment=comment, replied_by=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def put(self, request, id):
+    #     """ here id is comment id """
+    #     try:
+    #         comment = Comment.objects.get(id=id)
+    #     except Comment.DoesNotExist:
+    #         return Response(
+    #                 {
+    #                     "error": True,
+    #                     "error_msg": "Comment not found"
+    #                 },
+    #                 status=status.HTTP_404_NOT_FOUND
+    #             )
+    #     if comment.commented_by == UserProfile.objects.get(username = request.user):
+    #         serializer = CommentSerializer(comment, request.data, remove_fields = ['commented_by_user', 'post'])
+    #     else:
+    #         return Response(
+    #                 {
+    #                     "error": True,
+    #                     "error_msg": "Not commented by you"
+    #                 },
+    #                 status = status.HTTP_401_UNAUTHORIZED
+    #             )
 
-        if serializer.is_valid(raise_exception = ValueError):
-            serializer.save()
-            return Response(serializer.data, status = status.HTTP_200_OK)
-        return Response(
-               {
-                   "error":True,
-                   "error_msg": serializer.error_messages,
-               },
-               status=status.HTTP_400_BAD_REQUEST
-           )
+    #     if serializer.is_valid(raise_exception = ValueError):
+    #         serializer.save()
+    #         return Response(serializer.data, status = status.HTTP_200_OK)
+    #     return Response(
+    #            {
+    #                "error":True,
+    #                "error_msg": serializer.error_messages,
+    #            },
+    #            status=status.HTTP_400_BAD_REQUEST
+    #        )
 
-    def delete(self, request, id):
-        try:
-            comment = Comment.objects.get(id=id)
-        except Comment.DoesNotExist:
-            return Response(
-                    {
-                        "error": True,
-                        "error_msg": "Comment not found"
-                    },
-                    status=status.HTTP_404_NOT_FOUND
-                )
-        if comment.commented_by == UserProfile.objects.get(username = request.user):
-            comment.delete()
-            return Response({"success":"comment deleted"},
-                    status = status.HTTP_200_OK
-                )
-        return Response(
-                {
-                    "error": True,
-                    "error_msg": "Not commented by you"
-                },
-                status = status.HTTP_401_UNAUTHORIZED
-            )
+    # def delete(self, request, id):
+    #     try:
+    #         comment = Comment.objects.get(id=id)
+    #     except Comment.DoesNotExist:
+    #         return Response(
+    #                 {
+    #                     "error": True,
+    #                     "error_msg": "Comment not found"
+    #                 },
+    #                 status=status.HTTP_404_NOT_FOUND
+    #             )
+    #     if comment.commented_by == UserProfile.objects.get(username = request.user):
+    #         comment.delete()
+    #         return Response({"success":"comment deleted"},
+    #                 status = status.HTTP_200_OK
+    #             )
+    #     return Response(
+    #             {
+    #                 "error": True,
+    #                 "error_msg": "Not commented by you"
+    #             },
+    #             status = status.HTTP_401_UNAUTHORIZED
+    #         )
+
+# comment and reply
+
+
+# class CommentViewSet(viewsets.ModelViewSet):
+#     serializer_class = CommentSerializer
+    
+#     def get_queryset(self):
+#         queryset = Comment.objects.all()
+#         post_id = self.request.query_params.get('post_id', None)
+#         if post_id is not None:
+#             queryset = queryset.filter(post=post_id)
+#         return queryset
+    
+#     def create(self, request, *args, **kwargs):
+#     #    post_id = request.data.get('post_id')
+#         post_id = request.query_params.get('post_id', None)
+#         serializer = CommentSerializer(data=request.data, context={'view': self, 'post_id': post_id})
+#         serializer.is_valid(raise_exception=True)
+#         self.perform_create(serializer)
+#         headers = self.get_success_headers(serializer.data)
+#         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+#     def perform_create(self, serializer):
+#         serializer.save()
+# class CommentListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = Comment.objects.all()
+#     serializer_class = CommentSerializer
+    
+    
+
+# class CommentRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Comment.objects.all()
+#     serializer_class = CommentSerializer
+#     def post(self, request, *args, **kwargs):
+#         post_id = self.kwargs.get('pk')  # get the post id from the URL
+#         post = Post.objects.get(id=post_id)  # get the post object using the id
+#         serializer = self.get_serializer(data=request.data, context={'post': post})
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         headers = self.get_success_headers(serializer.data)
+#         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+# class ReplyListCreateAPIView(generics.ListCreateAPIView):
+#     queryset = Reply.objects.all()
+#     serializer_class = ReplySerializer
+
+# class ReplyRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Reply.objects.all()
+#     serializer_class = ReplySerializer
