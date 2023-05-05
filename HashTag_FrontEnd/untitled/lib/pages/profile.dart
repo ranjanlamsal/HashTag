@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:untitled/api/auth/auth_api.dart';
 import 'package:untitled/api/post_api.dart';
 import 'package:untitled/constant.dart';
+import 'package:untitled/pages/login.dart';
 
 import '../api/tag_api.dart';
 import '../models/post_model.dart';
@@ -52,30 +54,45 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor:Color.fromARGB(255, 202,207,250),
         elevation: 1,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: Colors.black,
-          onPressed: (){
-            // Navigator.pushNamed(context, 'home');
-          },
-        ),
+        // leading: IconButton(
+        //   icon: Icon(Icons.arrow_back),
+        //   color: Colors.black,
+        //   onPressed: (){
+        //     // Navigator.pushNamed(context, 'home');
+        //   },
+        // ),
        
         // ),
         
         centerTitle: false,
         actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.dehaze), color: Colors.black),
+          // IconButton(onPressed: (){}, icon: Icon(Icons.dehaze), color: Colors.black),
 
 
           
         ],
         
         ),
+        drawer: Drawer(backgroundColor: drawer_color,
+        child: ListView(
+          children:[ 
+            DrawerHeader(child: Text("HashTag")),
+            ListTile(
+            title: Text("Logout"),
+            onTap: () {
+             
+              logout();
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>const MyLogin()));
+            },
+          ),
+        ])),
         body: Column(
           children: [
             // SizedBox(height: 10),
+            
             Text("Posts",style: 
             TextStyle(color: Colors.black,fontSize: 28,fontWeight: FontWeight.w800),),
+            // Expanded(child: TagList(self_tags: self_tags),),
             Expanded(
               child: SelfPostList(selfposts: selfposts),
             )

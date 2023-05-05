@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget
               {
                   return FutureBuilder<User?>
                   (
-                    future: getUser(token),
+                    future: getUser(),
                     builder: (context,snapshot)
                   {
                     if(snapshot.hasData)

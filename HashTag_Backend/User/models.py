@@ -21,6 +21,8 @@ class UserProfile(AbstractUser):
     def get_hashtags(self):
         return list(self.tags.all())
 
+    def get_comments(self):
+        return list(self.comments.all())
 
     def get_email(self):
         return self.email

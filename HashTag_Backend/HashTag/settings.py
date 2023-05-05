@@ -233,7 +233,8 @@ USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = None
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False
 REST_AUTH_SERIALIZERS ={
-    "LOGIN_SERIALIZER":"User.serializers.NewLoginSerializer"
+    "LOGIN_SERIALIZER":"User.serializers.NewLoginSerializer",
+    "USER_DETAILS_SERIALIZER":"User.serializers.UserDetailSerializer"
     
 }
 REST_AUTH_REGISTER_SERIALIZERS = {

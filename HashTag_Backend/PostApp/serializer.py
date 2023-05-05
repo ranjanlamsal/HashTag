@@ -25,10 +25,11 @@ class CommentSerializer(ModelSerializer):
             for field_name in remove_fields:
                 self.fields.pop(field_name)
     # commented_by = UserPublicProfileSerializer(read_only = True)
+    commentor_by = serializers.ReadOnlyField(source = 'commentor_by.username')
     comment = serializers.CharField(required=True)
     class Meta:
         model = Comment
-        fields= ['id','comment', 'commentor_by','post', 'comment_time']
+        fields= ['id','post', 'commentor_by','comment', 'comment_time']
     
     def get_replies(self, obj):
         replies_queryset = obj.replies.all()
@@ -36,7 +37,7 @@ class CommentSerializer(ModelSerializer):
         return replies_serializer.data
 
 
-class ReplySerializer(serializers.ModelSerializer):
+class ReplySerializer(ModelSerializer):
     # reply_to = serializers.PrimaryKeyRelatedField(queryset=Comment.objects.all())
     replied_by_user = serializers.ReadOnlyField(source='replied_by.username')
     reply = serializers.CharField(required=True)

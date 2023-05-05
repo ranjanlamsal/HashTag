@@ -5,6 +5,7 @@ import "package:http/http.dart" as http;
 import "package:untitled/constant.dart";
 
 import '../../models/user_models.dart';
+import "../post_api.dart";
 
 var authtoken;
 Future<dynamic> userAuth(String username, String password) async{
@@ -27,7 +28,7 @@ Future<dynamic> userAuth(String username, String password) async{
     var box =await Hive.openBox(tokenBox);
     box.put("token",token);
     authtoken =box.get('token');
-    User? user = await getUser(token);
+    User? user = await getUser();
     // putTokenValue(token);
     
     return user;
@@ -50,8 +51,9 @@ Future<dynamic> userAuth(String username, String password) async{
   }
 }
 
-Future<User?>? getUser(String token)
+Future<User?>? getUser()
 async {
+  var token = await getToken();
   var url = Uri.parse("$baseUrl/user/auth/user/");
   var res = await http.get(
     url,
@@ -62,9 +64,12 @@ async {
   if(res.statusCode == 200)
   {
     var json = jsonDecode(res.body);
+    print(json);
     User user =  User.fromJSon(json);
     user.token = token;
+    print(user);
     return user;
+  
     
   }
   else
@@ -100,7 +105,7 @@ async {
       String token = json["key"];
       var box = await Hive.openBox(tokenBox);
       box.put("token",token);
-      var a = await getUser(token);
+      var a = await getUser();
       if(a!= null)
      {
         User user = a;
@@ -134,8 +139,9 @@ async {
   }
   
 }
-Future<User?>? logout(String token)
+Future<User?>? logout()
 async {
+  var token = await getToken();
   var url = Uri.parse("$baseUrl/user/auth/logout/");
   var res = await http.get(
     url,
@@ -145,4 +151,24 @@ async {
   );
  
 }
+
+// Future<dynamic>? getinfo()
+// async {
+//   var token = await getToken();
+//   var url = Uri.parse("$baseUrl/user/auth/user/");
+//   var res = await http.get(
+//     url,
+//     headers: {
+//       'Authorization':'Token ${token}',
+//     }
+//   );
+//   var data = jsonDecode(res.body.toString());
+//   if(res.statusCode==200)
+//   {
+//     print(data);
+//     return data;
+//   }
+
+ 
+// }
 

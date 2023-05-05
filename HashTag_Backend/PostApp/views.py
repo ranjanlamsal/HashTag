@@ -319,7 +319,7 @@ class CommentView(APIView):
         data = request.data
         commentor_by = UserProfile.objects.get(username=request.user)
         # self.post_id = id
-        serializer = CommentSerializer(data = request.data, remove_fields = ['commentor_by', 'post'])
+        serializer = CommentSerializer(data = request.data, remove_fields = ['post'])
         if serializer.is_valid(raise_exception = ValueError):
             comment = serializer.save(post = post, commentor_by=commentor_by)
             return Response(CommentSerializer(comment).data, status = status.HTTP_200_OK)
@@ -333,6 +333,24 @@ class CommentView(APIView):
     
 class ReplyView(APIView):
     serializer_class = ReplySerializer
+    
+    # def get(self,request,id):
+    #     # try:
+    #     #     comment = Comment.objects.get(id = id)
+    #     # except Comment.DoesNotExist:
+    #     #     return Response(
+    #     #         {
+    #     #             "error": True,
+    #     #             "error_msg": "Post not found"
+    #     #         },
+    #     #         status=status.HTTP_404_NOT_FOUND
+    #     #     )
+    #     comment = Comment.objects.get(id =id)
+    #     replies = Reply.objects.filter(comment=comment)
+    #     serializer = ReplySerializer(replies,many = True)
+    #     return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+
+        
     def get_object(self, pk):
         try:
             return Reply.objects.get(pk=pk)
@@ -342,18 +360,18 @@ class ReplyView(APIView):
     def get(self, request, id=None):
         if id is not None:
             reply = self.get_object(id)
-            serializer = self.serializer_class(reply)
+            serializer = ReplySerializer(reply)
             return Response(serializer.data)
         else:
             replies = Reply.objects.all()
-            serializer = self.serializer_class(replies, many=True)
+            serializer = ReplySerializer(replies, many=True)
             return Response(serializer.data)
     def post(self, request, id):
         serializer = ReplySerializer(data=request.data)
         if serializer.is_valid():
-            comment = get_object_or_404(Comment, id=id)
-            serializer.save(comment=comment, replied_by=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            reply = get_object_or_404(Comment, id=id)
+            serializer.save(reply=reply, replied_by=request.user)
+            return Response(ReplySerializer(reply.data), status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     # def put(self, request, id):
     #     """ here id is comment id """

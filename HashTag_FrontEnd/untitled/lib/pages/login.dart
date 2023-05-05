@@ -7,6 +7,7 @@ import 'package:untitled/api/auth/auth_api.dart';
 import 'package:untitled/models/user_cubit.dart';
 import 'package:untitled/models/user_models.dart';
 import 'package:untitled/pages/signup.dart';
+import 'package:untitled/pages/start_page.dart';
 import 'home.dart';
 
 
@@ -86,12 +87,12 @@ class _MyLoginState extends State<MyLogin> {
                        });
                      }
                      ),
-                        Text('Remember me'),
+                        Text('Remember me',style: TextStyle(fontSize: 12),),
                 
                         SizedBox(
-                          width: 40,
+                          width: 45,
                         ),
-                        Text('Forgot Password'),
+                        Text('Forgot Password',style: TextStyle(fontSize: 10,decoration: TextDecoration.underline),),
                       ],
                     ),
                     SizedBox(
@@ -124,7 +125,7 @@ class _MyLoginState extends State<MyLogin> {
                             User user = authRes;
                             context.read<UserCubit>().emit(user);
                             Navigator.of(context).push(MaterialPageRoute(builder: (context){
-                            return Homepage();
+                            return StartPage();
                           }
                           )
                           );
@@ -138,12 +139,12 @@ class _MyLoginState extends State<MyLogin> {
                     SizedBox(
                       height: 20,
                     ),
-                    Row(
-                      children:[
-                      Text('Login with'),
-                        ///Add facebook and all like figma
-                     ],
-                    ),
+                    // Row(
+                    //   children:[
+                    //   Text('Login with'),
+                    //     ///Add facebook and all like figma
+                    //  ],
+                    // ),
                     SizedBox(
                       height: 20,
                     ),
@@ -153,7 +154,7 @@ class _MyLoginState extends State<MyLogin> {
                         Text("Don't have a accout?"),
                 
                         SizedBox(
-                          width: 47,
+                          width: 30,
                         ),
                 
                         Container(

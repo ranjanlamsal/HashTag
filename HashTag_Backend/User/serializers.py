@@ -16,6 +16,7 @@
 # from rest_framework.permissions import IsAuthenticated
 from dj_rest_auth.serializers import LoginSerializer
 from dj_rest_auth.registration.serializers import RegisterSerializer
+from dj_rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
 
 
@@ -29,6 +30,9 @@ class NewRegisterSerializer(RegisterSerializer):
 
 class NewLoginSerializer(LoginSerializer):
     pass 
+
+class UserDetailSerializer(UserDetailsSerializer):
+    pass
 # class UserSerializer(serializers.ModelSerializer):
 #     permission_classes = [IsAuthenticated]
 #     def create(self, validated_data):

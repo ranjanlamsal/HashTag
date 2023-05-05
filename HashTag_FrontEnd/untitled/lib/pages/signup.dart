@@ -132,31 +132,37 @@ class _SignUpState extends State<SignUp> {
                             context.read<UserCubit>().emit(user);
                             Navigator.of(context).push(MaterialPageRoute(builder: (context){
                             return Homepage();
-                          }
-                            ));
+                          },
+
+                          
+                            ),
+
+                            );
                         };
-                        child: Text('SIGNUP', style: TextStyle(color: Colors.white),
-                        );
-                        }
-                      )
+                        // child: Text('SIGNUP', style: TextStyle(color: Colors.black),
+                        
+                        },
+                        child: Text("SIGNUP",style: TextStyle(color: Colors.white)),
+                      ),
+                    
                     ),
                     SizedBox(
                       height: 10,
                     ),
-                    Column(
-                      children:[
-                        Text('or',style: TextStyle(fontSize: 12),),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text('Continue with Google'),
-                        SizedBox(
-                          height: 8,
-                        ),
-                        Text('Continue with Facebook'),
-                        ///Add google and facebook picture before text
-                      ],
-                    ),
+                    // Column(
+                    //   children:[
+                    //     Text('or',style: TextStyle(fontSize: 12),),
+                    //     SizedBox(
+                    //       height: 8,
+                    //     ),
+                    //     Text('Continue with Google'),
+                    //     SizedBox(
+                    //       height: 8,
+                    //     ),
+                    //     Text('Continue with Facebook'),
+                    //     ///Add google and facebook picture before text
+                    //   ],
+                    // ),
                     SizedBox(
                       height: 20,
                     ),
@@ -166,7 +172,7 @@ class _SignUpState extends State<SignUp> {
                         Text("Have an Account?"),
 
                         SizedBox(
-                          width: 90,
+                          width: 60,
                         ),
 
                         Container(

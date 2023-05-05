@@ -130,9 +130,9 @@ class GetTagFollowers(APIView):
 
 
 class FollowTagView(APIView):
-    def post(self, request, id):
+    def post(self, request, title):
         user = UserProfile.objects.get(username = request.user)
-        tag = Tag.objects.get(id = id)
+        tag = Tag.objects.get(title =title)
         followers_entry = tag.followers.all()
         follower_list = list()
         for entry in followers_entry:
@@ -143,7 +143,7 @@ class FollowTagView(APIView):
         
         new_entry = UserTagFollowing(followerUser= user, following_tag_id=tag)
         new_entry.save()
-        return Response(status = status.HTTP_200_OK)
+        return Response(status = status.HTTP_201_CREATED_OK)
 
 def get_tag(id):
     try:
