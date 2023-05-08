@@ -225,6 +225,20 @@ class TagPosts(APIView):
         return Response({
             "error": "invalid_user"
         })
+        
+class TotalPostTag(APIView):
+    def get(self, request):
+        tags = Tag.objects.all()
+        tag_data = []
+        for tag in tags:
+            total_posts = Post.objects.filter(tag=tag).count()
+            tag_data.append({
+                "tag_title": tag.title,
+                "total_posts": total_posts
+            })
+        tag_data.sort(key=lambda x: x["total_posts"], reverse=True)  # Sort tags by total_posts in descending order
+        return Response(tag_data)
+         
 
 
 class UserLikedPosts(APIView):

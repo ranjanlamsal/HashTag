@@ -126,7 +126,7 @@ class _PostsListState extends State<PostsList> {
           child: Column(
             
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            children: [ 
               GestureDetector(
                 onTap: () async{
                   String tag_name = widget.posts[index].tag_name.toString();

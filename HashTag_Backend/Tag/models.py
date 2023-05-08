@@ -9,6 +9,7 @@ class Tag(models.Model):
     rules = models.TextField(blank = True, default="None Rules Applied", max_length=10000)
     created_by = models.ForeignKey(UserProfile,on_delete=models.CASCADE, related_name="created_by")
     created_at = models.DateTimeField(auto_now_add=True)
+    
     # followed_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="followers")
     
 

@@ -38,6 +38,8 @@ class Post(models.Model):
 
     def get_tag(self):
         return self.tag
+    
+    
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='commented_on')

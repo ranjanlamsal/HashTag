@@ -113,6 +113,22 @@ Future<List<Follows_Tag>> getTagFollowers(String tagName)async
 }
 
 
+Future<List> getTotalPostTag() async {
+  var token = await getToken();
+  var response = await http
+      .get(Uri.parse('$baseUrl/post/totalposttag/'),
+      headers: {
+        // 'Authorization': 'Token $token',
+            'Authorization': 'Token $token',
+  },      );
+  if (response.statusCode == 200) {
+    List<dynamic> data = jsonDecode(response.body);
+    return data;
+  } else {
+    throw Exception('Failed to load tags');
+  }
+}
+
 
 
 
