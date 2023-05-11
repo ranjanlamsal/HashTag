@@ -238,7 +238,21 @@ class TotalPostTag(APIView):
             })
         tag_data.sort(key=lambda x: x["total_posts"], reverse=True)  # Sort tags by total_posts in descending order
         return Response(tag_data)
-         
+    
+class TotalPost(APIView):
+    
+    # def get(self, request):
+    #     user = UserProfile.objects.get(username = request.user)
+    #     # print(user)
+    #     posts = Post.objects.filter(posted_by = user)
+    #     serializer = PostSerializer(posts, many=True)
+    #     return Response(serializer.data)
+    def get(self,request,):
+        user = UserProfile.objects.get(username = request.user)
+        post_count = Post.objects.filter(posted_by = user).count()
+        return Response(post_count);
+        
+
 
 
 class UserLikedPosts(APIView):

@@ -68,3 +68,23 @@ Future<List<Post>> getSelfPost() async {
     throw Exception('Failed to load posts');
   }
 }
+
+Future<int> getTotalSelfPost() async
+{
+  var token = await getToken();
+  var response = await http
+      .get(Uri.parse('$baseUrl/post/self/count/'),
+      headers: {
+        // 'Authorization': 'Token $token',
+    'Authorization': 'Token $token',
+  },      );
+  var data = jsonDecode(response.body);
+  if(response.statusCode==200)
+  {
+    int data = jsonDecode(response.body);
+    return data;
+  }
+  else{
+    throw Exception('Failed to load count');
+  }
+}

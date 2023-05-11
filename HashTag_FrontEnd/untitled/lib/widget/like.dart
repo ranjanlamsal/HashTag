@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:untitled/api/comment_api.dart';
 import 'package:untitled/models/comment_model.dart';
 
 import '../api/vote.dart';
@@ -28,6 +29,7 @@ class _CountState extends State<Count> {
 
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Column(
           children: [
@@ -52,9 +54,10 @@ class _CountState extends State<Count> {
                   });
                 }
               },
-              icon: Icon(
-                _isLiked ? Icons.arrow_upward_sharp : Icons.arrow_circle_up_rounded,
-              ),
+              icon: ImageIcon(AssetImage("assets/Upvote.png"),size: 24) 
+              // Icon(
+                // _isLiked ? Icons.arrow_upward_sharp : Icons.arrow_circle_up_rounded,
+              // ),
             ),
             Text(widget.postdata.upvote_count.toString())
           ],
@@ -94,23 +97,30 @@ class _CountState extends State<Count> {
                   });
                 }
               },
-              icon: Icon(
-                _isUnliked ? Icons.arrow_downward_sharp : Icons.arrow_circle_down_rounded,
-              ),
+              icon: ImageIcon(AssetImage("assets/Downvote.png"),size: 24,) 
+              // Icon(
+              //   _isUnliked ? Icons.arrow_downward_sharp : Icons.arrow_circle_down_rounded,
+              // ),
               ),
               
             Text(widget.postdata.downvote_count.toString())
           ],
         ),
-        IconButton(onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context)=>
-          
-          Comments(post: widget.postdata)
-          ));
-          
+        Column(
+          children: [
+            IconButton(onPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>
+              
+              Comments(post: widget.postdata)
+              ));
+              
 
-        }, icon: Icon(Icons.insert_comment_rounded))
+            }, icon: ImageIcon(AssetImage("assets/Message.png"),size: 24) 
 
-      ],
+    ),
+            Text('1'),
+            
+          ],
+        )],
     );   
   }}   

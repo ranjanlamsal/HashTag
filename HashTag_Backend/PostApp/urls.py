@@ -8,7 +8,9 @@ urlpatterns = [
     # path('list/', views.Post_list_view, name='PostList'),#
     path('list/', views.PostRandomListView.as_view(), name='PostRandomListView'),
     path('detail/<int:pk>', views.Post_detail_view, name='PostInfoAPI'),#
-    path('self/', views.SelfPostListCreateView.as_view(), name = 'SelfPostListcreateView'),#
+    path('self/', views.SelfPostListCreateView.as_view(), name = 'SelfPostListcreateView'),
+    path('self/count/', views.TotalPost.as_view(), name = 'TotalSelfPostView'),#
+    
     path('list/<str:title>', views.TagPosts.as_view(), name = 'TagPosts'),
     path('totalposttag/', views.TotalPostTag.as_view(), name = 'TagPosts'),
     path('upvoted_by/', views.UserLikedPosts.as_view(), name = 'UserLikedPosts'),

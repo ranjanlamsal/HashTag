@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:untitled/api/auth/auth_api.dart';
 import 'package:untitled/api/post_api.dart';
 import 'package:untitled/constant.dart';
+import 'package:untitled/models/user_models.dart';
 import 'package:untitled/pages/login.dart';
 
 import '../api/tag_api.dart';
 import '../models/post_model.dart';
 import '../models/tag_model.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 
@@ -20,23 +22,40 @@ class Profile extends StatefulWidget {
 class _ProfileState extends State<Profile> {
   late List<Tag> self_tags = [];
   late List<Post> selfposts = [];
+  User? user;
+  int? count;
   @override
   void initState()
   {
     super.initState();
     selfposts = [];
     self_tags =[];
+    
     getSelfPost().then((value)
     {
       setState(() {
         selfposts=value;
       });
     });
-    getSelf_tag().then((value)
+    getUser()?.then((value)
+    {
+      {
+        setState(() {
+          user=value;
+        });
+      }});
+      getSelf_tag().then((value)
     {
       {
         setState(() {
           self_tags=value;
+        });
+      }});
+      getTotalSelfPost().then((value)
+    {
+      {
+        setState(() {
+          count=value;
         });
       }});
   }
@@ -54,24 +73,8 @@ class _ProfileState extends State<Profile> {
       appBar: AppBar(
         backgroundColor:Color.fromARGB(255, 202,207,250),
         elevation: 1,
-        // leading: IconButton(
-        //   icon: Icon(Icons.arrow_back),
-        //   color: Colors.black,
-        //   onPressed: (){
-        //     // Navigator.pushNamed(context, 'home');
-        //   },
-        // ),
-       
-        // ),
         
         centerTitle: false,
-        actions: [
-          // IconButton(onPressed: (){}, icon: Icon(Icons.dehaze), color: Colors.black),
-
-
-          
-        ],
-        
         ),
         drawer: Drawer(backgroundColor: drawer_color,
         child: ListView(
@@ -86,18 +89,78 @@ class _ProfileState extends State<Profile> {
             },
           ),
         ])),
-        body: Column(
+        body:
+        Flex(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          direction: Axis.vertical,
+          
           children: [
-            // SizedBox(height: 10),
-            
-            Text("Posts",style: 
-            TextStyle(color: Colors.black,fontSize: 28,fontWeight: FontWeight.w800),),
-            // Expanded(child: TagList(self_tags: self_tags),),
+             if (user != null) Padding(
+               padding: const EdgeInsets.only(top:30.0),
+               child: Center(
+                 child: Text(user!.username.toString(),
+                 style: GoogleFonts.montserrat(
+                      textStyle: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+    ),
+  ),),
+               ),
+             ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+               children: [
+                if (count != null) Column(
+                  children: [
+                    Text(count.toString()),
+                    Text("Post")
+                  ],
+                ),
+                Column(children: [
+                  Text('20'),
+                  Text("Followers")
+                ],)
+              
+                 
+               ],
+             ),
+             Padding(
+              padding: const EdgeInsets.only(left:20.0,top: 10),
+              
+              child: Text("HashTags",
+              style: GoogleFonts.montserrat(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                
+              )
+              ),
+            ),
+            Flexible(
+                  fit: FlexFit.loose, // optional: specify the flex factor
+                  child: Container(
+          
+                  child: TagList(self_tags: self_tags),
+      ),
+    ),
+            Padding(
+              padding: const EdgeInsets.only(left:20.0,top: 10,bottom: 10),
+              
+              child: Text("Posts",style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold
+              ),),
+            ),
             Expanded(
-              child: SelfPostList(selfposts: selfposts),
-            )
-          ]),
-
+                  flex: 2,
+                  child: Container(
+                  child: SelfPostList(selfposts: selfposts),
+      ),
+    ),
+  ],
+)
+       
 
       );
 
@@ -117,8 +180,14 @@ class TagList extends StatelessWidget {
       itemBuilder: (BuildContext context, int index) {
         return Container(
           key: ValueKey(self_tags[index].id),
-          margin: EdgeInsets.only(top: 20),
-          padding: EdgeInsets.all(10),
+          margin: EdgeInsets.only(top: 20,left: 20,right: 20),
+          padding: EdgeInsets.only(left: 20,right: 20,top: 20,bottom: 40),
+          
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(10),
+            color: Color.fromARGB(255, 83,84,176)
+          ),
         child: Column(
           children: [
             Row(
@@ -151,39 +220,42 @@ class SelfPostList extends StatelessWidget {
         return Container(
           
           key: ValueKey(selfposts[index].id),
-          margin: EdgeInsets.only(top: 20),
+          margin: EdgeInsets.only(bottom: 20),
           padding: EdgeInsets.all(10),
           
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
+            // border: Border.all(color: Colors.grey),
             // borderRadius: BorderRadius.circular(10),
             color: Colors.white
           ),
-          child: Column(
-            
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("# "+ selfposts[index].tag_name.toString(),
-                style:TextStyle(
-                  color: Colors.black,fontSize: 24,fontWeight: FontWeight.w500
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: Column(
+              
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text("# "+ selfposts[index].tag_name.toString(),
+                  style:TextStyle(
+                    color: Colors.black,fontSize: 24,fontWeight: FontWeight.w500
+                  ),
                 ),
-              ),
-              Text(selfposts[index].posted_by_user.toString(), style: TextStyle(
-                color: Colors.grey,fontSize: 10,
-              ),),
-              Text(selfposts[index].created_at.toString(),
-                style: TextStyle(
+                Text(selfposts[index].posted_by_user.toString(), style: TextStyle(
                   color: Colors.grey,fontSize: 10,
                 ),),
-              SizedBox(
-                height:10,
-              ),
-              Text(selfposts[index].content.toString(),style: TextStyle(color: Colors.black,fontSize: 14,
-                    ),   
-
-          ),
-          SizedBox(height: 10,)],
-          //       ),
+                Text(selfposts[index].created_at.toString(),
+                  style: TextStyle(
+                    color: Colors.grey,fontSize: 10,
+                  ),),
+                SizedBox(
+                  height:10,
+                ),
+                Text(selfposts[index].content.toString(),style: TextStyle(color: Colors.black,fontSize: 14,
+                      ),   
+          
+            ),
+            SizedBox(height: 10,)],
+            //       ),
+            ),
           ));
             }
   

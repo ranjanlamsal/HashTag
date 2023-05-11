@@ -44,17 +44,20 @@ class _HomepageState extends State<Homepage> {
     
     
     return  Scaffold(
-        backgroundColor: Color.fromARGB(255, 202,207,250),
+        backgroundColor:Color.fromARGB(255, 202,207,250),
          
         appBar: AppBar(
           
       
-        
-          backgroundColor:Color.fromARGB(255, 202,207,250),
+          automaticallyImplyLeading: false,
+          backgroundColor:Colors.white70,
           elevation: 0,
           
-          title: Image.asset("assets/logo.png",
-          width : 70,
+          title: Padding(
+            padding: const EdgeInsets.only(left: 16),
+            child: Image.asset("assets/logo.png",
+            width : 70,
+            ),
           ),
           
           centerTitle: false,
@@ -109,56 +112,61 @@ class _PostsListState extends State<PostsList> {
   Widget build(BuildContext context) {
     
     return ListView.builder(
+      
       key: UniqueKey(),
       itemCount: widget.posts.length,
       itemBuilder: (BuildContext context, int index) {
         return Container(
           
           key: ValueKey(widget.posts[index].id),
-          margin: EdgeInsets.only(top: 20),
-          padding: EdgeInsets.all(10),
+          margin: EdgeInsets.only(top: 5),
+          padding: EdgeInsets.only(left: 10,top: 25,bottom: 25),
           
           decoration: BoxDecoration(
             border: Border.all(color: Colors.grey),
             // borderRadius: BorderRadius.circular(10),
             color: Colors.white
           ),
-          child: Column(
-            
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [ 
-              GestureDetector(
-                onTap: () async{
-                  String tag_name = widget.posts[index].tag_name.toString();
-                  List<Post> tag_posts = await getTag_Post(tag_name);
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>PostsFromTag(posts:tag_posts, tag_name: tag_name,),),);
-                },
-                child: Text("# "+ widget.posts[index].tag_name.toString(),
-                  style:TextStyle(
-                    color: Colors.black,fontSize: 24,fontWeight: FontWeight.w500
+          child: Padding(
+            padding: const EdgeInsets.only(left: 16,right: 16),
+            child: Column(
+              
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [ 
+                GestureDetector(
+                  onTap: () async{
+                    String tag_name = widget.posts[index].tag_name.toString();
+                    List<Post> tag_posts = await getTag_Post(tag_name);
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>PostsFromTag(posts:tag_posts, tag_name: tag_name,),),);
+                  },
+                  child: Text("# "+ widget.posts[index].tag_name.toString(),
+                    style:TextStyle(
+                      color: Colors.black,fontSize: 24,fontWeight: FontWeight.w500
+                    ),
                   ),
                 ),
-              ),
-              Text(widget.posts[index].posted_by_user.toString(), style: TextStyle(
-                color: Colors.grey,fontSize: 10,
-              ),),
-              Text(widget.posts[index].created_at.toString(),
-                style: TextStyle(
+                Text(widget.posts[index].posted_by_user.toString(), style: TextStyle(
                   color: Colors.grey,fontSize: 10,
                 ),),
-              SizedBox(
-                height:10,
-              ),
-              Text(widget.posts[index].content.toString(),style: TextStyle(color: Colors.black,fontSize: 14,
-                    ), 
-                    
-
-          ),
-          SizedBox(height: 1,),
-          Count(postdata: widget.posts[index]),
+                Text(widget.posts[index].created_at.toString(),
+                  style: TextStyle(
+                    color: Colors.grey,fontSize: 10,
+                  ),),
+                SizedBox(
+                  height:15,
+                ),
+                Text(widget.posts[index].content.toString(),style: TextStyle(color: Colors.black,fontSize: 14,
+                      ), 
+                      
           
-          SizedBox(height: 10,)],
-          //       ),
+            ),
+            SizedBox(height: 1,),
+            
+            Count(postdata: widget.posts[index]),
+            
+            SizedBox(height: 10,)],
+            //       ),
+            ),
           ));
             }
   

@@ -19,7 +19,8 @@ class _StartPageState extends State<StartPage> {
     Create(),
     Profile(),
     Recommended(),
-    Trending()
+    Trending(),
+    Create()
 
     
   ];
@@ -32,121 +33,133 @@ class _StartPageState extends State<StartPage> {
         child: currentScreen,
         bucket: bucket,
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.indigoAccent,
-        child: Icon(Icons.add),
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: Colors.indigoAccent,
+      //   child: Icon(Icons.add),
 
-        onPressed: () {
-          Navigator.pushNamed(context, 'Create');
-        },
-      ),
+      //   onPressed: () {
+      //     Navigator.pushNamed(context, 'Create');
+      //   },
+      // ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         shape: CircularNotchedRectangle(),
+        color:Color.fromARGB(255, 202,207,250), 
         notchMargin: 10,
         child: Container(
           height:60,
           child:Row(
-             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  MaterialButton(
-                      minWidth: 40,
-                      onPressed:(){
-                        setState(() {
-                          currentScreen=Homepage();
-                          currentTab=0;
-                        });
-                      },
-                      child:Column(
+              MaterialButton(
+                  minWidth: 30,
+                  onPressed:(){
+                    setState(() {
+                      currentScreen=Homepage();
+                      currentTab=0;
+                    });
+                  },
+                  child:Column(
               mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.home,
-                            color: Colors.indigoAccent,
-                          ),
-                          Text('Home',
-                            style: TextStyle(color:Colors.indigoAccent,),
-                          )
-                        ],
+                    children: [
+                      Icon(
+                        Icons.home,
+                        color: Colors.indigoAccent,
+                      ),
+                      // Text('Home',
+                      //   style: TextStyle(color:Colors.indigoAccent,),
+                      // )
+                    ],
           )
-                  ),
-                  MaterialButton(
-                      minWidth: 40,
-                      onPressed:(){
-                        setState(() {
-                          currentScreen=Trending();
-                          currentTab=1;
-                        });
-                      },
-                      child:Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.trending_up,
-                            color:Colors.indigoAccent,
-                          ),
-                          Text('Trending',
-                            style: TextStyle(color:  Colors.indigoAccent ,),
-                          )
-                        ],
-                      )
-                  ),
-
-                ],
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              MaterialButton(
+                  minWidth: 30,
+                  onPressed:(){
+                    setState(() {
+                      currentScreen=Trending();
+                      currentTab=1;
+                    });
+                  },
+                  child:Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.trending_up_rounded,
+                        color:Colors.indigoAccent,
+                      ),
+                      // Text('Trending',
+                      //   style: TextStyle(color:  Colors.indigoAccent ,),
+                      // )
+                    ],
+                  )
+              ),
+              MaterialButton(
+                  minWidth: 30,
+                  onPressed:(){
+                    setState(() {
+                      currentScreen=Create();
+                      currentTab=1;
+                    });
+                  },
+                  child:Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.add_circle,
+                        color:Colors.indigoAccent,
+                      ),
+                      // Text('Create',
+                      //   style: TextStyle(color:  Colors.indigoAccent ,),
+                      // )
+                    ],
+                  )
+              ),
+
+                
+              
+              MaterialButton(
+              minWidth: 30,
+              onPressed:(){
+                setState(() {
+                  currentScreen=Recommended();
+                  currentTab=3;
+                });
+              },
+              child:Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  MaterialButton(
-                      minWidth: 40,
-                      onPressed:(){
-                        setState(() {
-                          currentScreen=Recommended();
-                          currentTab=3;
-                        });
-                      },
-                      child:Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.recommend,
-                            color: Colors.indigoAccent,
-                          ),
-                          Text('Recommended',
-                            style: TextStyle(color:Colors.indigoAccent,),
-                          )
-                        ],
-                      )
+                  Icon(
+                    Icons.recommend,
+                    color: Colors.indigoAccent,
                   ),
-                  MaterialButton(
-                      minWidth: 40,
-                      onPressed:(){
-                        setState(() {
-                          currentScreen=Profile();
-                          currentTab=4;
-                        });
-                      },
-                      child:Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.person,
-                            color:Colors.indigoAccent,
-                          ),
-                          Text('Profile',
-                            style: TextStyle(color:  Colors.indigoAccent ,),
-                          )
-                        ],
-                      )
-                  ),
-
+                  // Text('Recommended',
+                  //   style: TextStyle(color:Colors.indigoAccent,),
+                  // )
                 ],
+              )
               ),
-            ],
-          )
+              MaterialButton(
+              minWidth: 30,
+              onPressed:(){
+                setState(() {
+                  currentScreen=Profile();
+                  currentTab=4;
+                });
+              },
+              child:Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.person,
+                    color:Colors.indigoAccent,
+                  ),
+                  // Text('Profile',
+                  //   style: TextStyle(color:  Colors.indigoAccent ,),
+                  // )
+                ],
+              )
+              )
+          ])
         ),
       ),
     );

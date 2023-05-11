@@ -28,6 +28,27 @@ Future<List<Comment>> getComment(String postid) async {
     throw Exception('Failed to load Comments');
   }
 }
+Future<String> getCommentCount(String postid) async {
+  var token = await getToken();
+  var response = await http.get(
+    Uri.parse("$baseUrl/post/comment/$postid"),
+    headers: {
+      'Authorization': 'Token $token',
+    },
+  );
+  var data = jsonDecode(response.body);
+
+  print(data);
+  print(data.runtimeType);
+  if (response.statusCode == 200) {
+    List<dynamic> commentsData = jsonDecode(response.body);
+    print(response.body);
+    List<Comment> comments = commentsData.map((commentJson) => Comment.fromJson(commentJson)).toList();
+    return comments.length.toString();
+  } else {
+    throw Exception('Failed to load Comments');
+  }
+}
 Future<List<Reply>> getReply(String commentid) async {
   var token = await getToken();
   var response = await http.get(Uri.parse("$baseUrl/post/reply/$commentid"),

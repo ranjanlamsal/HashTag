@@ -143,7 +143,7 @@ class FollowTagView(APIView):
         
         new_entry = UserTagFollowing(followerUser= user, following_tag_id=tag)
         new_entry.save()
-        return Response(status = status.HTTP_201_CREATED_OK)
+        return Response(status = status.HTTP_201_CREATED)
 
 def get_tag(id):
     try:
