@@ -7,9 +7,9 @@ class Tag(models.Model):
     title = models.CharField(max_length=120, null = False, blank=False)
     content = models.TextField(blank= True, null= True)
     rules = models.TextField(blank = True, default="None Rules Applied", max_length=10000)
-    cover_photo = models.ImageField(null = True, blank = True)
     created_by = models.ForeignKey(UserProfile,on_delete=models.CASCADE, related_name="created_by")
     created_at = models.DateTimeField(auto_now_add=True)
+    
     # followed_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="followers")
     
 
@@ -24,7 +24,7 @@ class Tag(models.Model):
         return len(self.get_followers())
     
     def created_by_username(self):
-        return self.created_by.username.username
+        return self.created_by.username 
     
 
 

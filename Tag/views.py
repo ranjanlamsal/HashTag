@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import  Tag, UserTagFollowing
 from User.models import UserProfile
-from User.serializer import UserProfileSerializer
+# from User.serializer import UserProfileSerializer
 from .serializer import TagSerializer, TagCreateSerializer
 from rest_framework import status
 
@@ -17,7 +17,7 @@ from rest_framework.parsers import MultiPartParser
 class TagView(APIView):
     # parser_classes = [MultiPartParser]
     def post(self, request):
-        user = UserProfile.objects.get(username = request.user)
+        user = UserProfile.objects.get(username = request.username)
 
         serializer = TagCreateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=ValueError):
@@ -130,9 +130,9 @@ class GetTagFollowers(APIView):
 
 
 class FollowTagView(APIView):
-    def post(self, request, id):
+    def post(self, request, title):
         user = UserProfile.objects.get(username = request.user)
-        tag = Tag.objects.get(id = id)
+        tag = Tag.objects.get(title =title)
         followers_entry = tag.followers.all()
         follower_list = list()
         for entry in followers_entry:
@@ -143,7 +143,7 @@ class FollowTagView(APIView):
         
         new_entry = UserTagFollowing(followerUser= user, following_tag_id=tag)
         new_entry.save()
-        return Response(status = status.HTTP_200_OK)
+        return Response(status = status.HTTP_201_CREATED)
 
 def get_tag(id):
     try:

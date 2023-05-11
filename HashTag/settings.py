@@ -44,15 +44,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
+    'dj_rest_auth',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'dj_rest_auth.registration',
     'rest_framework',
     'rest_framework_simplejwt',
-    'rest_framework.authtoken',
     'cloudinary_storage',
     'api',
     'Tag',
     'User',
     'PostApp',
 ]
+SITE_ID = 1
+AUTH_USER_MODEL = "User.UserProfile"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -127,15 +134,17 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-REST_FRAMEWORK = {
-'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-        ],
-        'DEFAULT_AUTHENTICATION_CLASSES': (
-            'rest_framework.authentication.TokenAuthentication',
-        ),
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
+
 
 
 # Internationalization
@@ -213,4 +222,21 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': "dvjtdh4v9",
     'API_KEY': "782245269215114",
     'API_SECRET': "wanAa-_wuPQVSPjya4XLBu2zWg0"
+}
+
+ACCOUNT_AUTHENTICATION_METHOD = 'username'
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'username'
+USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = None
+ACCOUNT_CONFIRM_EMAIL_ON_GET = False
+REST_AUTH_SERIALIZERS ={
+    "LOGIN_SERIALIZER":"User.serializers.NewLoginSerializer",
+    "USER_DETAILS_SERIALIZER":"User.serializers.UserDetailSerializer"
+    
+}
+REST_AUTH_REGISTER_SERIALIZERS = {
+    "REGISTER_SERIALIZER":"User.serializers.NewRegisterSerializer"
 }
