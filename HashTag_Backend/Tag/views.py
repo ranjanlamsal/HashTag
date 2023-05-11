@@ -1,5 +1,6 @@
 import json
 import random
+import csv
 from django.shortcuts import redirect, render
 from django.http import Http404, HttpResponseBadRequest, JsonResponse
 from rest_framework.views import APIView
@@ -13,15 +14,23 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework.parsers import MultiPartParser
 
+tag_file = './staticfiles/tags.csv'
 
 class TagView(APIView):
     # parser_classes = [MultiPartParser]
     def post(self, request):
-        user = UserProfile.objects.get(username = request.username)
+        user = UserProfile.objects.get(username = request.user)
 
         serializer = TagCreateSerializer(data=request.data)
         if serializer.is_valid(raise_exception=ValueError):
             serializer.save(created_by = user)
+
+            #adding tags into tags.csv
+            with open(tag_file, 'a') as f:
+                writer = csv.writer(f)
+                writer.writerow([serializer.data['title'], serializer.data['content']])
+                print('done')
+
             return Response(
                     serializer.data,
                     status=status.HTTP_201_CREATED,
@@ -134,16 +143,31 @@ class FollowTagView(APIView):
         user = UserProfile.objects.get(username = request.user)
         tag = Tag.objects.get(title =title)
         followers_entry = tag.followers.all()
+        print(followers_entry)
         follower_list = list()
         for entry in followers_entry:
             if(user == entry.followerUser):
                 entry.delete()
-                return Response(status = status.HTTP_200_OK,)
+                return Response(
+                    {
+                    'unfollower user': user.username,
+                    'tag': tag.title,
+                    'status': 'unfollowed'
+                    },
+                    status = status.HTTP_201_CREATED,
+                    )
             # tag.followers.userProfile_id.remove(user)
         
         new_entry = UserTagFollowing(followerUser= user, following_tag_id=tag)
         new_entry.save()
-        return Response(status = status.HTTP_201_CREATED)
+        return Response(
+            {
+                'follower user': user.username,
+                'tag': tag.title,
+                'status': 'followed'
+            },
+            status = status.HTTP_201_CREATED,
+            )
 
 def get_tag(id):
     try:

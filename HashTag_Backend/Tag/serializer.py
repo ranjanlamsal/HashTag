@@ -38,5 +38,5 @@ class TagCreateSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Tag
-        fields = "__all__"
+        fields = ['title', 'content']
         
