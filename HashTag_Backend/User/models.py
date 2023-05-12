@@ -15,14 +15,14 @@ class UserProfile(AbstractUser):
     def get_username(self):
         return self.username
 
-    def get_posts(self):
-        return list(self.posts.all())
+    # def get_posts(self):
+    #     return list(self.posts.all())
 
-    def get_hashtags(self):
-        return list(self.tags.all())
+    # def get_hashtags(self):
+    #     return list(self.tags.all())
 
-    def get_comments(self):
-        return list(self.comments.all())
+    # def get_comments(self):
+    #     return list(self.comments.all())
 
     def get_email(self):
         return self.email
@@ -41,8 +41,8 @@ class UserProfile(AbstractUser):
     def get_public_details(self):
         data = {
             "username" : self.username,
-            "posts" : self.get_posts,
-            "hashtags": self.get_hashtags,
+            # "posts" : self.get_posts,
+            # "hashtags": self.get_hashtags,
         }
 
     # def __str__(self) -> str:

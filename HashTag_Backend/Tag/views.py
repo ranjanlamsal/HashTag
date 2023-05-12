@@ -1,3 +1,4 @@
+from collections import Counter
 import json
 import random
 import csv
@@ -10,6 +11,9 @@ from User.models import UserProfile
 # from User.serializer import UserProfileSerializer
 from .serializer import TagSerializer, TagCreateSerializer
 from rest_framework import status
+
+#import recommendation function
+from Tag.recommendation import get_recommendation
 
 from rest_framework import generics
 from rest_framework.parsers import MultiPartParser
@@ -26,10 +30,10 @@ class TagView(APIView):
             serializer.save(created_by = user)
 
             #adding tags into tags.csv
-            with open(tag_file, 'a') as f:
-                writer = csv.writer(f)
-                writer.writerow([serializer.data['title'], serializer.data['content']])
-                print('done')
+            # with open(tag_file, 'a') as f:
+            #     writer = csv.writer(f)
+            #     writer.writerow([serializer.data['title'], serializer.data['content']])
+            #     print('done')
 
             return Response(
                     serializer.data,
@@ -51,15 +55,18 @@ class TrendingTags(APIView):
         
 
 class SelfTagGetView(APIView):
+    
     def get(self, request):
         user = UserProfile.objects.get(username = request.user)
-        if(user in UserProfile.objects.all()):
-            tags = Tag.objects.filter(created_by = user)
-            serializer = TagSerializer(tags, many=True)
+        if(user):
+            selfTags = user_created_tags(user)
+            serializer = TagSerializer(selfTags, many=True)
             return Response(serializer.data)
         return Response({
             "error": "invalid_user"
         })
+ 
+
 class SelfTagView(APIView):
     # parser_classes = [MultiPartParser]
     def put(self, request, id):
@@ -143,7 +150,6 @@ class FollowTagView(APIView):
         user = UserProfile.objects.get(username = request.user)
         tag = Tag.objects.get(title =title)
         followers_entry = tag.followers.all()
-        print(followers_entry)
         follower_list = list()
         for entry in followers_entry:
             if(user == entry.followerUser):
@@ -215,3 +221,71 @@ class TagUserFollowSignal(APIView):
         return Response({
             "error": "invalid_user"
         })
+
+def user_followed_tags(user):
+    user = UserProfile.objects.get(username = user)
+    if(user):
+        tags = Tag.objects.all()
+        user_followed_tags = []
+        for tag in tags:
+            if str(user.username) in tag.get_followers():
+                user_followed_tags.append(tag.title)
+        return user_followed_tags
+
+def user_created_tags(user):
+    user = UserProfile.objects.get(username = user)
+    if(user):
+        tags = Tag.objects.filter(created_by = user)
+        user_Created_tags= []
+        for tag in tags:
+            user_Created_tags.append(tag.title)
+        return user_Created_tags
+
+#Recommended Tags
+
+def create_csv():
+    tags = Tag.objects.all()
+    with open(tag_file, 'w', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow(['title', 'content'])
+        for tag in tags:
+            writer.writerow([tag.title,tag.content])
+    f.close()
+    # with open(tag_file, 'a') as f:
+    #     writer = csv.writer(f)
+    #     writer.writerow(['title','content'])
+    #     for tag in tags:
+    #         writer.writerow([tag.title,tag.content])
+    # f.close()
+
+class RecommendTags(APIView):
+    def get(self, request):
+
+        #adding tags into tags.cs
+        create_csv()
+
+        user = UserProfile.objects.get(username = request.user)
+        user_Created_tags = user_created_tags(user)
+        user_Followed_Tags = user_followed_tags(user)
+
+        user_related_tags = list(set(user_Created_tags).union(set(user_Followed_Tags)))
+        print(user_related_tags)
+
+        recommended_tags = []
+        for tag in user_related_tags:
+            recommended_tag_title = get_recommendation(tag)
+            recommended_tags.append(Tag.objects.get(title = recommended_tag_title))
+        
+        # count the frequency of each tag in the list
+        count_dict = Counter(tag.title for tag in recommended_tags)
+        # sort the list based on the frequency of tags in descending order
+        sorted_tags = sorted(recommended_tags, key=lambda tag: -count_dict[tag.title])
+
+
+        recommended_tags = list(set(sorted_tags))
+        for recommended_tag in recommended_tags:
+            if recommended_tag.title in user_Followed_Tags:
+                print(recommended_tag)
+                recommended_tags.remove(recommended_tag)
+        serializer = TagSerializer(recommended_tags, many = True)
+        return Response(serializer.data)

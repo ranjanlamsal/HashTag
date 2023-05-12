@@ -17,7 +17,7 @@ class Tag(models.Model):
         return self.title
 
     def get_followers(self):
-        follower = [x.followerUser.username.username for x in self.followers.all()]
+        follower = [x.followerUser.username for x in self.followers.all()]
         return follower
 
     def get_follower_count(self):
