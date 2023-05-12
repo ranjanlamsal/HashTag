@@ -29,12 +29,6 @@ class TagView(APIView):
         if serializer.is_valid(raise_exception=ValueError):
             serializer.save(created_by = user)
 
-            #adding tags into tags.csv
-            # with open(tag_file, 'a') as f:
-            #     writer = csv.writer(f)
-            #     writer.writerow([serializer.data['title'], serializer.data['content']])
-            #     print('done')
-
             return Response(
                     serializer.data,
                     status=status.HTTP_201_CREATED,
@@ -210,14 +204,14 @@ class TagUserFollowSignal(APIView):
     def get(self, request, id):
         user = UserProfile.objects.get(username = request.user)
         tag = Tag.objects.get(id = id)
+        response_data = {"admin": False, "following": False}
         if(user):
-            if(user.username.username in tag.get_followers()):
-                return Response({
-                    "following": True
-                })
-            return Response({
-                "following": False
-            })
+            if (user == tag.created_by):
+                response_data["admin"] = True
+            if(user.username in tag.get_followers()):
+                response_data["following"] = True
+
+            return Response(response_data)
         return Response({
             "error": "invalid_user"
         })

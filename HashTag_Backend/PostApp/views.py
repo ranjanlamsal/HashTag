@@ -23,6 +23,13 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
 
+def get_tag_rules(tag_id):
+    tag = Tag.objects.get(id = tag_id)
+    return {
+        "follow_to_post": tag.follow_to_post,
+        "relevant_tags": tag.relevant_tags,
+    }
+
 class PostView(APIView):
     #post create view
 
@@ -31,35 +38,78 @@ class PostView(APIView):
     def post(self, request, id):
         user = UserProfile.objects.get(username = request.user)
         tag =Tag.objects.get(id = id)
-        followers = tag.get_followers()
-        # tag_id = request.data['tag_id']
-        # print(tag_id)
-        # tag = get_tag(tag_id)
-        if(user.username in followers):
-            if(tag is not None):
-                serializer = PostSerializer(data=request.data)
-                if serializer.is_valid(raise_exception=ValueError):
-                    serializer.save(posted_by = user, tag = Tag.objects.get(id=id))
+        rules = get_tag_rules(id)
+
+        if rules['follow_to_post']:
+                
+            followers = tag.get_followers()
+            # tag_id = request.data['tag_id']
+            # print(tag_id)
+            # tag = get_tag(tag_id)
+            if(user.username in followers):
+                if(tag is not None):
+                    serializer = PostSerializer(data=request.data)
+                    if serializer.is_valid(raise_exception=ValueError):
+                        if rules['relevant_tags']:
+                            serializer.save(posted_by = user, tag = tag, status = "unverified" )
+                            return Response(
+                                    serializer.data,
+                                    status=status.HTTP_201_CREATED,
+                                )
+                        serializer.save(posted_by = user, tag = tag, status = "verified" )
+                        return Response(
+                                serializer.data,
+                                status=status.HTTP_201_CREATED,
+                            )
                     return Response(
-                            serializer.data,
-                            status=status.HTTP_201_CREATED,
-                        )
+                            {
+                                "error":True,
+                                "error_msg": serializer.error_messages,
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                            )
                 return Response(
-                        {
-                            "error":True,
-                            "error_msg": serializer.error_messages,
-                        },
-                        status=status.HTTP_400_BAD_REQUEST
-                        )
-            return Response(
-                {
-                    "error":"Invalid Tag"
-                },
-                status = status.HTTP_400_BAD_REQUEST
-            )
-        return Response({
-            "error":"Follow Tag Before Posting"
-        })
+                    {
+                        "error":"Invalid Tag"
+                    },
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+            return Response({
+                "error":"Follow Tag Before Posting"
+            })
+        
+        else:
+            if(user):
+                if(tag is not None):
+                    serializer = PostSerializer(data=request.data)
+                    if serializer.is_valid(raise_exception=ValueError):
+                        if rules['relevant_tags']:
+                            serializer.save(posted_by = user, tag = tag, status = "unverified" )
+                            return Response(
+                                    serializer.data,
+                                    status=status.HTTP_201_CREATED,
+                                )
+                        serializer.save(posted_by = user, tag = tag, status = "verified")
+                        return Response(
+                                serializer.data,
+                                status=status.HTTP_201_CREATED,
+                            )
+                    return Response(
+                            {
+                                "error":True,
+                                "error_msg": serializer.error_messages,
+                            },
+                            status=status.HTTP_400_BAD_REQUEST
+                            )
+                return Response(
+                    {
+                        "error":"Invalid Tag"
+                    },
+                    status = status.HTTP_400_BAD_REQUEST
+                )
+            return Response({
+                "error":"Invalid User"
+            })
 
 class PostListAPIView(generics.ListAPIView):
     #list post in order of id
@@ -461,7 +511,6 @@ class ReplyView(APIView):
 
 # comment and reply
 
-
 # class CommentViewSet(viewsets.ModelViewSet):
 #     serializer_class = CommentSerializer
     
@@ -507,3 +556,4 @@ class ReplyView(APIView):
 # class ReplyRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = Reply.objects.all()
 #     serializer_class = ReplySerializer
+
