@@ -1,15 +1,21 @@
 from unittest.util import _MAX_LENGTH
 from django.db import models
 from User.models import UserProfile
-# Create your models here.
+
 
 class Tag(models.Model):
+    #Info
     title = models.CharField(max_length=120, null = False, blank=False)
     content = models.TextField(blank= True, null= True)
-    rules = models.TextField(blank = True, default="None Rules Applied", max_length=10000)
     created_by = models.ForeignKey(UserProfile,on_delete=models.CASCADE, related_name="created_by")
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
+    #Rules 
+    follow_to_post = models.BooleanField(default=False)
+    follow_to_comment = models.BooleanField(default=False)
+    follow_to_like = models.BooleanField(default=False)
+    general_rules = models.TextField(blank=True, null=True)
+    relevant_tags = models.TextField(blank=True, null=True)
     # followed_by = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name="followers")
     
 
@@ -26,7 +32,12 @@ class Tag(models.Model):
     def created_by_username(self):
         return self.created_by.username 
     
+    def get_relevant_tags(self):
+        relevant_tags = self.relevant_tags.lower()
+        return relevant_tags.split(',')
 
+    def get_tag_rules(self):
+        return self.general_rules
 
         
 # def get_following_tags(UserProfile):

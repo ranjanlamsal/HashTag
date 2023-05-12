@@ -41,7 +41,7 @@ class TagCreateSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = Tag
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'follow_to_post', 'relevant_tags']
     
     def save(self, **kwargs):
         self.validated_data['title'] = self.validated_data['title'].upper()

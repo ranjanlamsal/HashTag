@@ -9,6 +9,10 @@ def upload_to(instance, filename):
     return 'posts/{filename}'.format(filename=filename)
 
 class Post(models.Model):
+    status = (
+        ("VERIFIED", "verified"),
+        ("UNVERIFIED", "unverified"),
+    )
     # title = models.CharField(max_length=120)
     content = models.TextField(blank= True, null= True)
     posted_by = models.ForeignKey(UserProfile,on_delete = models.CASCADE, blank = False, related_name='posted_by')
@@ -17,6 +21,11 @@ class Post(models.Model):
     upvote_users = models.ManyToManyField(UserProfile, default=None, blank = True, related_name = "upvoted_post")
     downvote_users = models.ManyToManyField(UserProfile, default=None, blank = True, related_name = "downvoted_post")
     created_at = models.DateTimeField(auto_now=True, blank= True, null=True)
+    status = models.CharField(
+        max_length=10,
+        choices=status,
+        default="UNVERIFIED",
+    )
 
     def tag_name(self):
         return self.tag.title
