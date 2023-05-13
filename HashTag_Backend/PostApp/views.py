@@ -50,7 +50,7 @@ class PostView(APIView):
                 if(tag is not None):
                     serializer = PostSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=ValueError):
-                        if rules['relevant_tags'] != None:
+                        if rules['relevant_tags']:
                             serializer.save(posted_by = user, tag = tag, status = "UNVERIFIED" )
                             return Response(
                                     serializer.data,
@@ -83,7 +83,7 @@ class PostView(APIView):
                 if(tag is not None):
                     serializer = PostSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=ValueError):
-                        if rules['relevant_tags'] != None:
+                        if rules['relevant_tags']:
                             serializer.save(posted_by = user, tag = tag, status = "unverified" )
                             return Response(
                                     serializer.data,
