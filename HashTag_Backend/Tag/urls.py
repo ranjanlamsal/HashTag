@@ -11,6 +11,6 @@ urlpatterns = [
     path('followtag/<str:title>/', views.FollowTagView.as_view(), name='followtag'),
     path('trending/',views.TrendingTags.as_view(), name='trendingtags'),
     path('suggested/', views.SuggestedTags.as_view(), name='suggestedtags'),
-    path('usertagfolowingsignal/<int:id>', views.TagUserFollowSignal.as_view(), name='taguserfollowingsignal'),
+    path('usertagfolowingsignal/<str:title>', views.TagUserFollowSignal.as_view(), name='taguserfollowingsignal'),
     path('recommend/', views.RecommendTags.as_view(), name='recommendtags'),
 ]

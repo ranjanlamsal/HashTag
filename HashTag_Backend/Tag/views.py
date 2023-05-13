@@ -201,9 +201,9 @@ class SuggestedTags(APIView):
         })
 
 class TagUserFollowSignal(APIView):
-    def get(self, request, id):
+    def get(self, request, title):
         user = UserProfile.objects.get(username = request.user)
-        tag = Tag.objects.get(id = id)
+        tag = Tag.objects.get(title = title)
         response_data = {"admin": False, "following": False}
         if(user):
             if (user == tag.created_by):
