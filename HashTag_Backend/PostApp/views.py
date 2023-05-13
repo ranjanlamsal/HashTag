@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 from Tag.serializer import TagSerializer
 from rest_framework import status
 from rest_framework import authentication, permissions
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
 from rest_framework import generics
 
 from rest_framework.permissions import AllowAny
@@ -33,7 +33,7 @@ def get_tag_rules(tag_id):
 class PostView(APIView):
     #post create view
 
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     
     def post(self, request, id):
         user = UserProfile.objects.get(username = request.user)

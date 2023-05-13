@@ -52,8 +52,9 @@ class SelfTagGetView(APIView):
     
     def get(self, request):
         user = UserProfile.objects.get(username = request.user)
-        if(user):
-            selfTags = user_created_tags(user)
+        if(user in UserProfile.objects.all()):
+            # selfTags = user_created_tags(user)
+            selfTags = Tag.objects.filter(created_by = user)
             serializer = TagSerializer(selfTags, many=True)
             return Response(serializer.data)
         return Response({
@@ -112,10 +113,10 @@ class TagListAPIView(generics.ListAPIView):
 
 
 class TagDetailAPIView(APIView):
-    def get(self, request,id):
+    def get(self, request,title):
         user= UserProfile.objects.get(username = request.user)
         if(user):
-            tag = Tag.objects.get(id = id)
+            tag = Tag.objects.get(title = title)
             serializer = TagSerializer(tag)
             return Response(serializer.data)
 
@@ -201,9 +202,9 @@ class SuggestedTags(APIView):
         })
 
 class TagUserFollowSignal(APIView):
-    def get(self, request, id):
+    def get(self, request, title):
         user = UserProfile.objects.get(username = request.user)
-        tag = Tag.objects.get(id = id)
+        tag = Tag.objects.get(title = title)
         response_data = {"admin": False, "following": False}
         if(user):
             if (user == tag.created_by):
