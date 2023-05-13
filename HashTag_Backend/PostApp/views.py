@@ -17,7 +17,7 @@ from django.contrib.auth.models import User
 from Tag.serializer import TagSerializer
 from rest_framework import status
 from rest_framework import authentication, permissions
-from rest_framework.parsers import MultiPartParser, FormParser , JSONParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework import generics
 
 from rest_framework.permissions import AllowAny
@@ -52,15 +52,13 @@ class PostView(APIView):
                     if serializer.is_valid(raise_exception=ValueError):
                         if rules['relevant_tags']:
                             serializer.save(posted_by = user, tag = tag, status = "UNVERIFIED" )
-                            return Response(
-                                    serializer.data,
-                                    status=status.HTTP_201_CREATED,
-                                )
+                            return Response({
+                                    "error_msg":"followede and if relevant tag"
+                            })
                         serializer.save(posted_by = user, tag = tag, status = "VERIFIED" )
-                        return Response(
-                                serializer.data,
-                                status=status.HTTP_201_CREATED,
-                            )
+                        return Response({
+                                "error_msg":" followed and if notrelevant tag"
+                            })
                     return Response(
                             {
                                 "error":True,
@@ -85,14 +83,12 @@ class PostView(APIView):
                     if serializer.is_valid(raise_exception=ValueError):
                         if rules['relevant_tags']:
                             serializer.save(posted_by = user, tag = tag, status = "unverified" )
-                            return Response(
-                                    serializer.data,
-                                    status=status.HTTP_201_CREATED,
+                            return Response({
+                                    "msg":"not and if relevant tag"}
                                 )
                         serializer.save(posted_by = user, tag = tag, status = "verified")
-                        return Response(
-                                serializer.data,
-                                status=status.HTTP_201_CREATED,
+                        return Response({
+                                "msg":"not and if not relevant tag"}
                             )
                     return Response(
                             {
