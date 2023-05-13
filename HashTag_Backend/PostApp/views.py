@@ -23,8 +23,8 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework import viewsets
 
-def get_tag_rules(tag_id):
-    tag = Tag.objects.get(id = tag_id)
+def get_tag_rules(tag_title):
+    tag = Tag.objects.get(title = tag_title)
     return {
         "follow_to_post": tag.follow_to_post,
         "relevant_tags": tag.relevant_tags,
@@ -35,10 +35,10 @@ class PostView(APIView):
 
     parser_classes = [MultiPartParser, FormParser, JSONParser]
     
-    def post(self, request, id):
+    def post(self, request, title):
         user = UserProfile.objects.get(username = request.user)
-        tag =Tag.objects.get(id = id)
-        rules = get_tag_rules(id)
+        tag =Tag.objects.get(title = title)
+        rules = get_tag_rules(title)
 
         if rules['follow_to_post']:
                 
@@ -51,12 +51,12 @@ class PostView(APIView):
                     serializer = PostSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=ValueError):
                         if rules['relevant_tags']:
-                            serializer.save(posted_by = user, tag = tag, status = "unverified" )
+                            serializer.save(posted_by = user, tag = tag, status = "UNVERIFIED" )
                             return Response(
                                     serializer.data,
                                     status=status.HTTP_201_CREATED,
                                 )
-                        serializer.save(posted_by = user, tag = tag, status = "verified" )
+                        serializer.save(posted_by = user, tag = tag, status = "VERIFIED" )
                         return Response(
                                 serializer.data,
                                 status=status.HTTP_201_CREATED,
@@ -64,7 +64,7 @@ class PostView(APIView):
                     return Response(
                             {
                                 "error":True,
-                                "error_msg": serializer.error_messages,
+                                "error_msg": serializer.error_messages
                             },
                             status=status.HTTP_400_BAD_REQUEST
                             )

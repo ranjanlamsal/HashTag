@@ -26,10 +26,6 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
         fields = ['id', 'title', 'created_by_username', 'created_at', 'followers', 'follower_count', 'post_count']
 
-    def save(self, **kwargs):
-        self.validated_data['title'] = self.validated_data['title'].upper()
-        return super(TagCreateSerializer, self).save(**kwargs)
-
 class TagCreateSerializer(serializers.ModelSerializer):
     title = serializers.CharField(
         max_length=120,
