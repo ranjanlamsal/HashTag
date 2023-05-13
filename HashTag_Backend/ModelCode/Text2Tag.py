@@ -6,7 +6,7 @@ tokenizer = AutoTokenizer.from_pretrained("efederici/text2tags")
 def Generatetag(text: str):
     """ Generates tags from given text """
     text = text.strip().replace('\n', '')
-    text = 'summarize: ' + text
+    text = 'tag: ' + text
     tokenized_text = tokenizer.encode(text, return_tensors="pt")
 
     tags_ids = model.generate(tokenized_text,

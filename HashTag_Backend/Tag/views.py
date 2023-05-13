@@ -53,9 +53,9 @@ class SelfTagGetView(APIView):
     def get(self, request):
         user = UserProfile.objects.get(username = request.user)
         if(user):
-            selfTags = user_created_tags(user)
-            serializer = TagSerializer(selfTags, many=True)
-            return Response(serializer.data)
+            tags = Tag.objects.filter(created_by = user)
+            serializer = TagSerializer(tags, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response({
             "error": "invalid_user"
         })
@@ -227,7 +227,7 @@ def user_followed_tags(user):
         return user_followed_tags
 
 def user_created_tags(user):
-    user = UserProfile.objects.get(username = user)
+    user = UserProfile.objects.get(user = user)
     if(user):
         tags = Tag.objects.filter(created_by = user)
         user_Created_tags= []

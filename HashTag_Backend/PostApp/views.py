@@ -33,7 +33,7 @@ def get_tag_rules(tag_id):
 class PostView(APIView):
     #post create view
 
-    parser_classes = [MultiPartParser, FormParser]
+    # parser_classes = [MultiPartParser, FormParser]
     
     def post(self, request, id):
         user = UserProfile.objects.get(username = request.user)
@@ -51,12 +51,12 @@ class PostView(APIView):
                     serializer = PostSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=ValueError):
                         if rules['relevant_tags']:
-                            serializer.save(posted_by = user, tag = tag, status = "unverified" )
+                            serializer.save(posted_by = user, tag = tag, status = "UNVERIFIED" )
                             return Response(
                                     serializer.data,
                                     status=status.HTTP_201_CREATED,
                                 )
-                        serializer.save(posted_by = user, tag = tag, status = "verified" )
+                        serializer.save(posted_by = user, tag = tag, status = "VERIFIED" )
                         return Response(
                                 serializer.data,
                                 status=status.HTTP_201_CREATED,
@@ -64,7 +64,7 @@ class PostView(APIView):
                     return Response(
                             {
                                 "error":True,
-                                "error_msg": serializer.error_messages,
+                                "error_msg": serializer.error_messages
                             },
                             status=status.HTTP_400_BAD_REQUEST
                             )
