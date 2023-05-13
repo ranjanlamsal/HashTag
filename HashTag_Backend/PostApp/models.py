@@ -34,7 +34,7 @@ class Post(models.Model):
         return self.posted_by.username
     
     def __str__(self) -> str:
-        return self.content[0:20]
+        return self.content
 
     def no_of_upvotes(self):
         upvote = self.upvote_users.all().count()
