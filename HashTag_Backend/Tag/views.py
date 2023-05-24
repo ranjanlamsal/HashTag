@@ -59,6 +59,20 @@ class SelfTagGetView(APIView):
         return Response({
             "error": "invalid_user"
         })
+        
+class SelfTotalTag(APIView):
+    
+    # def get(self, request):
+    #     user = UserProfile.objects.get(username = request.user)
+    #     # print(user)
+    #     posts = Post.objects.filter(posted_by = user)
+    #     serializer = PostSerializer(posts, many=True)
+    #     return Response(serializer.data)
+    def get(self,request,):
+        user = UserProfile.objects.get(username = request.user)
+        tag_count = Tag.objects.filter(created_by = user).count()
+        return Response(tag_count);
+        
  
 
 class SelfTagView(APIView):

@@ -5,6 +5,8 @@ urlpatterns = [
     path('', views.TagView.as_view(), name="tagcreateview"),
     path('self/update/<int:id>', views.SelfTagView.as_view(), name = "SelfTagUpdateDeleteView"),
     path('self/', views.SelfTagGetView.as_view(), name = "SelfTagListView"),
+    path('self/count', views.SelfTotalTag.as_view(), name = "SelfTagCountView"),
+    
     path('list/', views.TagListAPIView.as_view(), name = "ListTagView"),
     path('detail/<str:title>', views.TagDetailAPIView.as_view(), name = "TagDetailView"),
     path('followers/<str:tagname>',views.GetTagFollowers.as_view(), name = "TagFollowers"),
