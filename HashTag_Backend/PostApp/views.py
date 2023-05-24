@@ -82,11 +82,11 @@ class PostView(APIView):
                     serializer = PostSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=ValueError):
                         if rules['relevant_tags']:
-                            serializer.save(posted_by = user, tag = tag, status = "unverified" )
+                            serializer.save(posted_by = user, tag = tag, status = "UNVERIFIED" )
                             return Response({
                                     "msg":"not and if relevant tag"}
                                 )
-                        serializer.save(posted_by = user, tag = tag, status = "verified")
+                        serializer.save(posted_by = user, tag = tag, status = "VERIFIED")
                         return Response({
                                 "msg":"not and if not relevant tag"}
                             )
@@ -167,30 +167,25 @@ Post_detail_view = PostDetailAPIView.as_view()
 
 
 class SelfPostListCreateView(APIView):
-    
     parser_classes = [MultiPartParser]
-    def post(self, request):
-        user = UserProfile.objects.get(username = request.user)
 
+    def post(self, request):
+        user = UserProfile.objects.get(username=request.user)
         serializer = PostSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=ValueError):
-            serializer.save(posted_by = user)
-            return Response(
-                    serializer.data,
-                    status=status.HTTP_201_CREATED,
-                )
+        if serializer.is_valid(raise_exception=True):
+            serializer.save(posted_by=user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(
-               {
-                   "error":True,
-                   "error_msg": serializer.error_messages,
-               },
-               status=status.HTTP_400_BAD_REQUEST
-               )
+            {
+                "error": True,
+                "error_msg": serializer.errors,
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     def get(self, request):
-        user = UserProfile.objects.get(username = request.user)
-        # print(user)
-        posts = Post.objects.filter(posted_by = user)
+        user = UserProfile.objects.get(username=request.user)
+        posts = Post.objects.filter(posted_by=user)
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
 
@@ -361,6 +356,7 @@ def get_user(user):
     return user
 
 class CommentView(APIView):
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     def get(self, request, id):
         try:
             post = Post.objects.get(id=id)
@@ -406,6 +402,7 @@ class CommentView(APIView):
            )
     
 class ReplyView(APIView):
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     serializer_class = ReplySerializer
     
     # def get(self,request,id):

@@ -16,12 +16,12 @@ from rest_framework import status
 from Tag.recommendation import get_recommendation
 
 from rest_framework import generics
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 tag_file = './staticfiles/tags.csv'
 
 class TagView(APIView):
-    # parser_classes = [MultiPartParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     def post(self, request):
         user = UserProfile.objects.get(username = request.user)
 
@@ -62,7 +62,7 @@ class SelfTagGetView(APIView):
  
 
 class SelfTagView(APIView):
-    # parser_classes = [MultiPartParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     def put(self, request, id):
         tag = Tag.objects.get(id= id)
         if not tag:
