@@ -82,11 +82,11 @@ class PostView(APIView):
                     serializer = PostSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=ValueError):
                         if rules['relevant_tags']:
-                            serializer.save(posted_by = user, tag = tag, status = "unverified" )
+                            serializer.save(posted_by = user, tag = tag, status = "UNVERIFIED" )
                             return Response({
-                                    "msg":"not and if relevant tag"}
+                                    "msg":"not followed and if relevant tag"}
                                 )
-                        serializer.save(posted_by = user, tag = tag, status = "verified")
+                        serializer.save(posted_by = user, tag = tag, status = "VERIFIED")
                         return Response({
                                 "msg":"not and if not relevant tag"}
                             )
