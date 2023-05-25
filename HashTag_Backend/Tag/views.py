@@ -263,7 +263,7 @@ class RecommendTags(APIView):
         user_Followed_Tags = user_followed_tags(user)
 
         user_related_tags = list(set(user_Created_tags).union(set(user_Followed_Tags)))
-        print(user_related_tags)
+        print("User related Teags" ,user_related_tags)
 
         recommended_tags = []
         for tag in user_related_tags:
