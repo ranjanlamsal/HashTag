@@ -4,9 +4,9 @@
 # from nbformat import ValidationError
 # from rest_framework import serializers
 # from rest_framework.validators import UniqueTogetherValidator
-# from .models import UserProfile
+from .models import UserProfile
 
-# from Tag.models import Tag
+from Tag.models import Tag
 
 
 # from rest_framework import serializers
@@ -18,6 +18,7 @@ from dj_rest_auth.serializers import LoginSerializer
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from dj_rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
+from PostApp.models import Post
 
 
 class NewRegisterSerializer(RegisterSerializer):
@@ -56,23 +57,18 @@ class UserDetailSerializer(UserDetailsSerializer):
 #                 ]
 
 
-# class UserProfileSerializer(serializers.ModelSerializer):
-#     def __init__(self, instance=None,**kwargs):
-#         remove_fields = kwargs.pop('remove_fields',None)
-#         super(UserProfileSerializer,self).__init__(instance,**kwargs)
+class UserProfileSerializer(serializers.ModelSerializer):
+    tagcount = serializers.SerializerMethodField('get_tag_count', read_only=True)
+    postcount = serializers.SerializerMethodField('get_post_count', read_only=True)
 
-#         if remove_fields:
-#             #for multiple fields in a list
-#             for field_name in remove_fields:
-#                 self.fields.pop(field_name)
-#     username = serializers.SlugRelatedField(slug_field='username', read_only=True)
-#     tagcount = serializers.SerializerMethodField('get_tag_count', read_only=True)
+    def get_post_count(self, obj):
+        return Post.objects.filter(posted_by = obj).count()
 
-#     def get_tag_count(self, obj):
-#         return Tag.objects.filter(created_by = obj).count()
-#     class Meta:
-#         model = UserProfile
-#         fields = ['username', 'id', 'first_name', 'last_name','email', 'tagcount']
+    def get_tag_count(self, obj):
+        return Tag.objects.filter(created_by = obj).count()
+    class Meta:
+        model = UserProfile
+        fields = ['username', 'id', 'first_name', 'last_name','email', 'tagcount', 'postcount']
 
 # class UserPublicProfileSerializer(serializers.ModelSerializer):
 #     username = serializers.SlugRelatedField(slug_field='username', read_only=True)

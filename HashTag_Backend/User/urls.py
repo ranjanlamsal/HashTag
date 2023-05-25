@@ -6,8 +6,9 @@ from rest_framework.authtoken import views
 from . import views
 
 urlpatterns = [
-     path('auth/', include('dj_rest_auth.urls')),
+    path('auth/', include('dj_rest_auth.urls')),
     path('auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('self-info/', views.UserProfileInfoView.as_view(), name='UserInfoAPI'),
 ]
     # path('', views.UserRecordView.as_view(), name="create"),
     # path('login/', auth.CustomAuthToken.as_view() , name="login"),

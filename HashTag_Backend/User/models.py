@@ -32,8 +32,8 @@ class UserProfile(AbstractUser):
             "email": self.email,
             "password" : self.password,
             # "gender" : self.gender,
-            # "first_name" : self.first_name,
-            # "last_name" : self.last_name,
+            "first_name" : self.first_name,
+            "last_name" : self.last_name,
             "reg_date" : self.date_joined,
         }
         return Response(data)
