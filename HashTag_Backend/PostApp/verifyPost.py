@@ -39,8 +39,8 @@ class VerifyPost(APIView):
             for model_tag in model_tags:
                 for relevant_tag in relevant_tags:
                     # relevant_tag = relevant_tag.lower()
-                    print(model_tag.lower(),relevant_tag.lower())
-                    if model_tag.lower() == relevant_tag.lower():
+                    print(model_tag.replace(" ", "").lower(),relevant_tag.replace(" ", "").lower())
+                    if model_tag.replace(" ", "").lower() == relevant_tag.replace(" ", "").lower():
                         post.status = "VERIFIED"
                         post.save()
                         return Response(
