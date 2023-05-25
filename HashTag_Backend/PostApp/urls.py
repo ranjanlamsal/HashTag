@@ -1,7 +1,7 @@
 from django.urls import path
 
 from . import views
-from . import verifyPost
+from . import verifyPost, search
 
 urlpatterns = [
     path('<str:title>', views.PostView.as_view(), name='UpdateSelfPostsAPI'),#
@@ -22,5 +22,5 @@ urlpatterns = [
     path('comment/<int:id>', views.CommentView.as_view(), name = 'CommentView'),
     path('reply/<int:id>', views.ReplyView.as_view(), name='ReplyView'),
     path('verify/<int:id>', verifyPost.VerifyPost.as_view(), name='VerifyPost'),
-    # path('posts/<int:post_id>/comments/', views.CommentViewSet.as_view({'get': 'list', 'post': 'create'}), name='post_comments'),
+    path('get_post/', search.Get_posts.as_view(), name='get_posts' )
 ]
