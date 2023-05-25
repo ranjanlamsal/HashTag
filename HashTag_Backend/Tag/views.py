@@ -241,7 +241,7 @@ def user_followed_tags(user):
         return user_followed_tags
 
 def user_created_tags(user):
-    user = UserProfile.objects.get(user = user)
+    user = UserProfile.objects.get(username = user)
     if(user):
         tags = Tag.objects.filter(created_by = user)
         user_Created_tags= []

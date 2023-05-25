@@ -1,21 +1,13 @@
-# from django.http import JsonResponse
-# from django.shortcuts import get_object_or_404, redirect, render
-# from .models import UserProfile
-# # from .serializer import UserSerializer, UserProfileSerializer
-# from django.contrib.auth.models import User
-# from PostApp.models import Post
-# from rest_framework.views import APIView
-# from rest_framework.response import Response
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 
-# from rest_framework import generics
-# from rest_framework import status
-# from rest_framework import authentication, permissions
-# from .permissions import IsStaffEditorPermission
+from User.serializers import UserProfileSerializer
+from .models import UserProfile
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
-# from Tag.models import Tag, UserTagFollowing
+from rest_framework import status
 
-
-# from . import serializer
 
 
 # class UserRecordView(APIView):
@@ -102,46 +94,47 @@
 #                )
 
 
-# class UserProfileInfoView(APIView):
-#     def get(self, request):
-#         user =UserProfile.objects.get(username = request.user)
-#         if user in UserProfile.objects.all():
-#             user_email = request.user.email
-#             serializer = UserProfileSerializer(user).data
-#             return Response(serializer)
-#         return JsonResponse({
-#             "error": "Invalid User"
-#         })
+class UserProfileInfoView(APIView):
+    def get(self, request):
+        user =UserProfile.objects.get(username = request.user)
+        if user in UserProfile.objects.all():
+            user_email = request.user.email
+            serializer = UserProfileSerializer(user).data
+            return Response(serializer)
+        return JsonResponse({
+            "error": "Invalid User"
+        })
 
-#     def put(self, request):
-#         user = get_object(request)
-#         request.data._mutable = True
-#         request.data["first_name"] = request.data["first_name"].title()
-#         request.data["last_name"] = request.data["last_name"].title()
-#         request.data._mutable = False
-#         serializer = UserProfileSerializer(user, data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self, request):
+        user = get_object(request)
+        request.data._mutable = True
+        request.data["first_name"] = request.data["first_name"].title()
+        request.data["last_name"] = request.data["last_name"].title()
+        request.data._mutable = False
+        serializer = UserProfileSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#     def delete(self, request):
-#         user = get_object(request)
-#         user.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request):
+        user = get_object(request)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
-# def get_object(request):
-#         try:
-#             user = request.user
-#             print(user.username)
-#             return get_object_or_404(UserProfile, username=user)
-#             print(user.username)
-#             #return Traveller.objects.get(username=user)
-#         except UserProfile.DoesNotExist:
-#             return Response(status=status.HTTP_400_BAD_REQUEST)
-# # class UserListAPIView(generics.ListAPIView):
+def get_object(request):
+        try:
+            user = request.user
+            print(user.username)
+            return get_object_or_404(UserProfile, username=user)
+            print(user.username)
+            #return Traveller.objects.get(username=user)
+        except UserProfile.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+# class UserListAPIView(generics.ListAPIView):
 
 # #     queryset = UserProfile.objects.all()
 # #     serializer_class = UserProfileSerializer

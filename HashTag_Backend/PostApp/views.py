@@ -52,13 +52,16 @@ class PostView(APIView):
                     if serializer.is_valid(raise_exception=ValueError):
                         if rules['relevant_tags']:
                             serializer.save(posted_by = user, tag = tag, status = "UNVERIFIED" )
-                            return Response({
-                                    "error_msg":"followede and if relevant tag"
-                            })
+                            return Response(
+                                    serializer.data,
+                                    status = status.HTTP_201_CREATED
+                            )
                         serializer.save(posted_by = user, tag = tag, status = "VERIFIED" )
-                        return Response({
-                                "error_msg":" followed and if notrelevant tag"
-                            })
+                        return Response(
+                                serializer.data,
+                                status = status.HTTP_201_CREATED
+                        )
+                                
                     return Response(
                             {
                                 "error":True,
@@ -83,12 +86,14 @@ class PostView(APIView):
                     if serializer.is_valid(raise_exception=ValueError):
                         if rules['relevant_tags']:
                             serializer.save(posted_by = user, tag = tag, status = "UNVERIFIED" )
-                            return Response({
-                                    "msg":"not followed and if relevant tag"}
+                            return Response(
+                                    serializer.data,
+                                    status = status.HTTP_201_CREATED
                                 )
                         serializer.save(posted_by = user, tag = tag, status = "VERIFIED")
-                        return Response({
-                                "msg":"not and if not relevant tag"}
+                        return Response(
+                                serializer.data,
+                                status = status.HTTP_201_CREATED
                             )
                     return Response(
                             {
@@ -122,8 +127,6 @@ class PostListAPIView(generics.ListAPIView):
 Post_list_view = PostListAPIView.as_view()
 
 class PostRandomListView(APIView):
-    
-    
     parser_classes = [MultiPartParser]
     def get(self, request):
         user = UserProfile.objects.get(username = request.user)
