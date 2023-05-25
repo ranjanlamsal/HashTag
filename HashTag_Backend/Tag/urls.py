@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, search
 
 urlpatterns = [
     path('', views.TagView.as_view(), name="tagcreateview"),
@@ -15,4 +15,5 @@ urlpatterns = [
     path('suggested/', views.SuggestedTags.as_view(), name='suggestedtags'),
     path('usertagfolowingsignal/<str:title>', views.TagUserFollowSignal.as_view(), name='taguserfollowingsignal'),
     path('recommend/', views.RecommendTags.as_view(), name='recommendtags'),
+    path('get_names/', search.Get_tags.as_view(), name='get_tags' )
 ]

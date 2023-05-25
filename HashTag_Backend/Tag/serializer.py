@@ -24,7 +24,7 @@ class TagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        fields = ['id', 'title', 'created_by_username', 'created_at', 'followers', 'follower_count', 'post_count', 'content']
+        fields = ['id', 'title', 'content', 'created_by_username', 'created_at', 'followers', 'follower_count', 'post_count']
 
 class TagCreateSerializer(serializers.ModelSerializer):
     title = serializers.CharField(

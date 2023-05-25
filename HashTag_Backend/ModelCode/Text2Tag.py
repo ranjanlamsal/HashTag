@@ -1,7 +1,8 @@
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import ast
 
-model = AutoModelForSeq2SeqLM.from_pretrained("Ranjan22/TextToTagGenerator")
-tokenizer = AutoTokenizer.from_pretrained("Ranjan22/TextToTagGenerator")
+model = AutoModelForSeq2SeqLM.from_pretrained("Ranjan22/TextToTagGenerator_large")
+tokenizer = AutoTokenizer.from_pretrained("Ranjan22/TextToTagGenerator_large")
 
 def Generatetag(text: str):
     """ Generates tags from given text """
@@ -16,6 +17,7 @@ def Generatetag(text: str):
                                         early_stopping=True)
 
     output = tokenizer.decode(tags_ids[0], skip_special_tokens=True)
-    return output.split(', ')
+    tags = ast.literal_eval(output)
+    return tags
 
 Generatetag("This is a sample text to generate tags from it")
