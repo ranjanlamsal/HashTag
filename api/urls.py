@@ -1,6 +1,5 @@
 from django.urls import path, include
 from .auth import CustomAuthToken
-from .views import ObtainTokenView
 urlpatterns = [
       path('auth/',CustomAuthToken.as_view()),
 #     path('tag/', include('Tag.urls')),
